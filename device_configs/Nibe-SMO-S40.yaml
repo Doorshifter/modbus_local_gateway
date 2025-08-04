@@ -1,0 +1,7713 @@
+device:
+  manufacturer: Nibe
+  model: SMO S40
+  max_register_read: 20
+  max_registers_per_second: 100
+
+read_write_word:
+
+
+
+  nibe_holding_register_11:
+    name: Degree minutes
+    address: 11
+    size: 2
+    signed: true
+    swap: word
+    control: number
+    number:
+      min: -3000
+      max: 3000
+    multiplier: 0.1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_18:
+    name: Limit DM
+    address: 18
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -3000
+      max: 3000
+    multiplier: 0.1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_20:
+    name: Cooling degree minutes
+    address: 20
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -3000
+      max: 3000
+    multiplier: 0.1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_26:
+    name: Heating curve climate system 1
+    address: 26
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 15
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_30:
+    name: Heating offset climate system 1
+    address: 30
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_34:
+    name: Min supply climate system 1
+    address: 34
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_38:
+    name: Max supply climate system 1
+    address: 38
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_39:
+    name: Own curve, heating P7
+    address: 39
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_40:
+    name: Own curve, heating P6
+    address: 40
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_41:
+    name: Own curve, heating P5
+    address: 41
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_42:
+    name: Own curve, heating P4
+    address: 42
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_43:
+    name: Own curve, heating P3
+    address: 43
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_44:
+    name: Own curve, heating P2
+    address: 44
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_45:
+    name: Own curve, heating P1
+    address: 45
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 80
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_46:
+    name: Point offset outdoor temperature
+    address: 46
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -40
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_47:
+    name: Point offset
+    address: 47
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_51:
+    name: External adjustment climate system 1
+    address: 51
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_55:
+    name: External adjustment with room sensor climate system 1
+    address: 55
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 30
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_61:
+    name: Stop temperature HW periodic increase
+    address: 61
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 55
+      max: 70
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_91:
+    name: Language
+    address: 91
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_93:
+    name: Period time heating
+    address: 93
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 180
+    multiplier: 1
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_95:
+    name: Operating mode heating medium pump
+    address: 95
+    size: 1
+    control: number
+    number:
+      min: 10
+      max: 40
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_103:
+    name: Fuse
+    address: 103
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 400
+    multiplier: 1
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_121:
+    name: Floor drying period 7
+    address: 121
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_122:
+    name: Floor drying period 6
+    address: 122
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_123:
+    name: Floor drying period 5
+    address: 123
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_124:
+    name: Floor drying period 4
+    address: 124
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_125:
+    name: Floor drying period 3
+    address: 125
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_126:
+    name: Floor drying period 2
+    address: 126
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_127:
+    name: Floor drying period 1
+    address: 127
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "d"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_128:
+    name: Floor drying temp. 7
+    address: 128
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_129:
+    name: Floor drying temp. 6
+    address: 129
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_130:
+    name: Floor drying temp. 5
+    address: 130
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_131:
+    name: Floor drying temp. 4
+    address: 131
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_132:
+    name: Floor drying temp. 3
+    address: 132
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_133:
+    name: Floor drying temp. 2
+    address: 133
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_134:
+    name: Floor drying temp. 1
+    address: 134
+    size: 1
+    control: number
+    number:
+      min: 15
+      max: 70
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_140:
+    name: Dimensioned outdoor temperature
+    address: 140
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -40
+      max: 20
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_141:
+    name: Delta T for DOT
+    address: 141
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 25
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_157:
+    name: Wait time shunt, shunt controlled additional heat
+    address: 157
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 300
+    multiplier: 1
+    unit_of_measurement: "s"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_165:
+    name: Waiting time cooling/heating
+    address: 165
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 48
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_166:
+    name: Heating start at under temp.
+    address: 166
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0.5
+      max: 10
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_167:
+    name: Cooling start at over temp.
+    address: 167
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0.5
+      max: 10
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_168:
+    name: Cooling shunt amplification
+    address: 168
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0.1
+      max: 10
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_169:
+    name: Cooling shunt waiting time
+    address: 169
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 300
+    multiplier: 1
+    unit_of_measurement: "s"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_170:
+    name: Cooling with room sensors
+    address: 170
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 4.1
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_172:
+    name: Start passive cooling DM
+    address: 172
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 500
+    multiplier: 1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_173:
+    name: Start active cooling DM
+    address: 173
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 300
+    multiplier: 1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_184:
+    name: Auto mode, stop temperature for heating
+    address: 184
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -20
+      max: 40
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_185:
+    name: Auto mode, additional heat stop temperature
+    address: 185
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -25
+      max: 40
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_186:
+    name: Auto mode filter time
+    address: 186
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 48
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_187:
+    name: Max difference supply, compressor
+    address: 187
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 25
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_188:
+    name: Max difference supply, additional heat
+    address: 188
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_206:
+    name: Room sensor set point value climate system 1
+    address: 206
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 30
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_210:
+    name: Room sensor factor climate system 1
+    address: 210
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 6
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_211:
+    name: Input AUX5
+    address: 211
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_212:
+    name: Input AUX4
+    address: 212
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_213:
+    name: Input AUX3
+    address: 213
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_214:
+    name: Input AUX2
+    address: 214
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_215:
+    name: Input AUX1
+    address: 215
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_216:
+    name: Output AUX1
+    address: 216
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_222:
+    name: Speed, brine pump
+    address: 222
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_223:
+    name: Preset flow setting for climate system
+    address: 223
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 3
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_224:
+    name: AUX relay (AUX11)
+    address: 224
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_237:
+    name: Oper. mode
+    address: 237
+    size: 1
+    control: select
+    options:
+      0: "Auto"
+      1: "Manual"
+      2: "Additional heat only"
+    multiplier: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_238:
+    name: Max. step internal additional heat
+    address: 238
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 7
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_681:
+    name: Cooling heat sensor set point value
+    address: 681
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 40
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_682:
+    name: Heating medium pump manual speed
+    address: 682
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_695:
+    name: Manual heating medium pump speed
+    address: 695
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_703:
+    name: Start diff. DM, step-controlled add. heat
+    address: 703
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 2000
+    multiplier: 1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_720:
+    name: Min. supply temp. cooling climate system 1
+    address: 720
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -5
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_721:
+    name: Own curve, cooling P3
+    address: 721
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 7
+      max: 40
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_722:
+    name: Own curve, cooling P5
+    address: 722
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 7
+      max: 40
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_736:
+    name: Period time cooling
+    address: 736
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 180
+    multiplier: 1
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_738:
+    name: Cooling delta temp. 20 deg C
+    address: 738
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 3
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_739:
+    name: Cooling delta temp. 40 deg C
+    address: 739
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 3
+      max: 20
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_767:
+    name: Input AUX6
+    address: 767
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_783:
+    name: Operating mode circulation pump heating heat pump 1
+    address: 783
+    size: 1
+    control: select
+    options:
+      0: "Auto"
+      1: "Manual"
+      2: "Additional heat only"
+    multiplier: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_841:
+    name: Speed circulation pump waiting mode heat pump 1
+    address: 841
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_844:
+    name: (SPA), heating activated (SPA)
+    address: 844
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 3
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_845:
+    name: (SPA), heating influence
+    address: 845
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_850:
+    name: (SPA), cooling influence
+    address: 850
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_851:
+    name: (SPA), area
+    address: 851
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 255
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_867:
+    name: Max. speed controlled charge pump (EB101)
+    address: 867
+    size: 1
+    control: number
+    number:
+      min: 80
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_967:
+    name: Cooling curve climate system 1
+    address: 967
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 9
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_975:
+    name: Cooling offset climate system 1
+    address: 975
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_976:
+    name: Own curve, cooling P4
+    address: 976
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 7
+      max: 40
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_977:
+    name: Own curve, cooling P2
+    address: 977
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 7
+      max: 40
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_978:
+    name: Own curve, cooling P1
+    address: 978
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 7
+      max: 40
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_980:
+    name: Current transformer ratio
+    address: 980
+    size: 1
+    control: number
+    number:
+      min: 300
+      max: 3000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_988:
+    name: Room sensor set point value climate system 1, cooling
+    address: 988
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 35
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_996:
+    name: Room sensor factor climate system 1, cooling
+    address: 996
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 6
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_997:
+    name: Set point value (RH)
+    address: 997
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 30
+      max: 90
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1016:
+    name: DM start difference (OPT)
+    address: 1016
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 2000
+    multiplier: 1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1021:
+    name: Exhaust air fan speed 4 (ERS 1)
+    address: 1021
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1022:
+    name: Exhaust air fan speed 3 (ERS 1)
+    address: 1022
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1023:
+    name: Exhaust air fan speed 2 (ERS 1)
+    address: 1023
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1024:
+    name: Exhaust air fan speed 1 (ERS 1)
+    address: 1024
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1025:
+    name: Exhaust air fan speed normal (ERS 1)
+    address: 1025
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1027:
+    name: Filtering time (BT64)
+    address: 1027
+    size: 1
+    control: number
+    number:
+      min: 5
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1028:
+    name: (ACS) - Thermostat, hysteresis between compressors
+    address: 1028
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1029:
+    name: Start temperature (BT64)
+    address: 1029
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -8
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1044:
+    name: Bypass temp. (ERS 1)
+    address: 1044
+    size: 1
+    control: number
+    number:
+      min: 2
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1052:
+    name: Max. internal additional heat SG Ready
+    address: 1052
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 9
+    multiplier: 0.01
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 2
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1066:
+    name: Hysteresis (OPT)
+    address: 1066
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 10
+      max: 2000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1071:
+    name: Delay timer EME
+    address: 1071
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 65535
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1077:
+    name: Defrosting time (FLM 4)
+    address: 1077
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1078:
+    name: Defrosting time (FLM 3)
+    address: 1078
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1079:
+    name: Defrosting time (FLM 2)
+    address: 1079
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1083:
+    name: Pump speed (FLM 4)
+    address: 1083
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1084:
+    name: Pump speed (FLM 3)
+    address: 1084
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1085:
+    name: Pump speed (FLM 2)
+    address: 1085
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1086:
+    name: Pump speed (FLM 1)
+    address: 1086
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 100
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1107:
+    name: El. price, special, smart energy source
+    address: 1107
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1108:
+    name: El. price, fixed, smart energy source
+    address: 1108
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1110:
+    name: El. price, fixed, smart energy source
+    address: 1110
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1111:
+    name: El. price, smart energy source
+    address: 1111
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 3
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1112:
+    name: El. price, fixed, smart energy source
+    address: 1112
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1114:
+    name: El. price, fixed, smart energy source
+    address: 1114
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1116:
+    name: El. price, fixed, smart energy source
+    address: 1116
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1117:
+    name: Prim. factor, smart energy source
+    address: 1117
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 5
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1118:
+    name: Prim. factor, shunt add. heat smart energy source
+    address: 1118
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 5
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1119:
+    name: Prim. factor, ext. step add. heat smart energy source
+    address: 1119
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 5
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1120:
+    name: Prim. factor, OPT10 smart energy source
+    address: 1120
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 5
+    multiplier: 0.1
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1121:
+    name: OPT10, high tariff price smart energy source
+    address: 1121
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1122:
+    name: OPT10, low tariff price smart energy source
+    address: 1122
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1123:
+    name: ext. step add. heat, high tariff price smart energy source
+    address: 1123
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1124:
+    name: ext. step add. heat, low tariff price smart energy source
+    address: 1124
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1125:
+    name: Shunt add. heat, high tariff price smart energy source
+    address: 1125
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1126:
+    name: Shunt add. heat, low tariff price smart energy source
+    address: 1126
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1127:
+    name: El. price, fixed, high tariff smart energy source
+    address: 1127
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1128:
+    name: El. price, fixed, low tariff smart energy source
+    address: 1128
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1129:
+    name: El. price, variable, high tariff smart energy source
+    address: 1129
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1130:
+    name: El. price, variable, low tariff smart energy source
+    address: 1130
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1131:
+    name: DM start source, priority 5 smart energy source
+    address: 1131
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 100
+      max: 2000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1132:
+    name: DM start source, priority 4 smart energy source
+    address: 1132
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 100
+      max: 2000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1133:
+    name: DM start source, priority 3 smart energy source
+    address: 1133
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 100
+      max: 2000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1134:
+    name: DM start source, priority 2 smart energy source
+    address: 1134
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 100
+      max: 2000
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1135:
+    name: DM start source, priority 1 smart energy source
+    address: 1135
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -2000
+      max: -10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1136:
+    name: Start day, tariff smart energy source
+    address: 1136
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1137:
+    name: End day, tariff smart energy source
+    address: 1137
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1138:
+    name: Start month, tariff smart energy source
+    address: 1138
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1139:
+    name: End month, tariff smart energy source
+    address: 1139
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1172:
+    name: Start day, fixed tariff smart energy source
+    address: 1172
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1173:
+    name: End day, fixed tariff smart energy source
+    address: 1173
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1174:
+    name: Start month, fixed tariff smart energy source
+    address: 1174
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1175:
+    name: End month, fixed tariff smart energy source
+    address: 1175
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1208:
+    name: Start day, tariff OPT10 smart energy source
+    address: 1208
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1209:
+    name: End day, tariff OPT10 smart energy source
+    address: 1209
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1210:
+    name: Start month, tariff OPT10 smart energy source
+    address: 1210
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1211:
+    name: End month, tariff OPT10 smart energy source
+    address: 1211
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1244:
+    name: Start day tariff, shunt additional heat smart energy source
+    address: 1244
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1245:
+    name: End day tariff, shunt additional heat  smart energy source
+    address: 1245
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1246:
+    name: Start month tariff, shunt additional heat smart energy source
+    address: 1246
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1247:
+    name: End month tariff, shunt additional heat smart energy source
+    address: 1247
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1280:
+    name: Start day tariff, ext. step add. heat smart energy source
+    address: 1280
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1281:
+    name: End day tariff, ext. step add. heat  smart energy source
+    address: 1281
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 31
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1282:
+    name: Start month tariff, ext. step add. heat smart energy source
+    address: 1282
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1283:
+    name: End month tariff, ext. step add. heat smart energy source
+    address: 1283
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 12
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1319:
+    name: Brine pump auto mode
+    address: 1319
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1326:
+    name: Max difference, SES priority 1 energy source
+    address: 1326
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 25
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1327:
+    name: Max difference, SES lower priority energy source
+    address: 1327
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 1
+      max: 25
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1555:
+    name: Input AUX7
+    address: 1555
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1556:
+    name: Input AUX8
+    address: 1556
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1557:
+    name: Input AUX9
+    address: 1557
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2109:
+    name: Modbus TCP/IP Ext. Available power (Solar PV)
+    address: 2109
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 65535
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2504:
+    name: Max. step internal additional heat
+    address: 2504
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 7
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2667:
+    name: Offset cooling (Solar PV)
+    address: 2667
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 0
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2668:
+    name: Offset heating (Solar PV)
+    address: 2668
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2676:
+    name: Time between filter replacement
+    address: 2676
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2677:
+    name: Time between filter replacement
+    address: 2677
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2678:
+    name: Time between filter replacement
+    address: 2678
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2679:
+    name: Time between filter replacement
+    address: 2679
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2700:
+    name: Return time fan 4
+    address: 2700
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2701:
+    name: Return time fan 4
+    address: 2701
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2702:
+    name: Return time fan 4
+    address: 2702
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2703:
+    name: Return time fan 4
+    address: 2703
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2704:
+    name: Return time fan 4
+    address: 2704
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2705:
+    name: Return time fan 4
+    address: 2705
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2706:
+    name: Return time fan 4
+    address: 2706
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2707:
+    name: Return time fan 4
+    address: 2707
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2708:
+    name: Return time fan 4
+    address: 2708
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2709:
+    name: Return time fan 4
+    address: 2709
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2710:
+    name: Return time fan 4
+    address: 2710
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2711:
+    name: Return time fan 4
+    address: 2711
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2712:
+    name: Return time fan 4
+    address: 2712
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2713:
+    name: Return time fan 4
+    address: 2713
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2714:
+    name: Return time fan 4
+    address: 2714
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2715:
+    name: Return time fan 4
+    address: 2715
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2728:
+    name: Time between filter replacement
+    address: 2728
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2729:
+    name: Time between filter replacement
+    address: 2729
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2730:
+    name: Time between filter replacement
+    address: 2730
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2731:
+    name: Time between filter replacement
+    address: 2731
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 24
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2740:
+    name: AUX from Modbus
+    address: 2740
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 68
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2743:
+    name: Operating mode
+    address: 2743
+    size: 1
+    control: select
+    options:
+      0: "Auto"
+      1: "Manual"
+      2: "Additional heat only"
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2745:
+    name: Phase Order L1
+    address: 2745
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 128
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2746:
+    name: Phase Order L2
+    address: 2746
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 128
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2747:
+    name: Phase Order L3
+    address: 2747
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 128
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2828:
+    name: Blocking actions (ERS 4)
+    address: 2828
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2829:
+    name: Blocking actions (ERS 4)
+    address: 2829
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2830:
+    name: Blocking actions (ERS 4)
+    address: 2830
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2831:
+    name: Blocking actions (ERS 4)
+    address: 2831
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2857:
+    name: Min. vent temp. (ERS 4)
+    address: 2857
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2858:
+    name: Min. vent temp. (ERS 4)
+    address: 2858
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2859:
+    name: Min. vent temp. (ERS 4)
+    address: 2859
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2860:
+    name: Min. vent temp. (ERS 4)
+    address: 2860
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 10
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3028:
+    name: Immersion heater power, emergency mode
+    address: 3028
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 45
+    multiplier: 0.01
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 2
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3033:
+    name: Factor
+    address: 3033
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3058:
+    name: Additional heat step, emergency mode
+    address: 3058
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 7
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3066:
+    name: Active days
+    address: 3066
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 127
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3067:
+    name: Active days
+    address: 3067
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 127
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3068:
+    name: Active days
+    address: 3068
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 127
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3069:
+    name: Active days
+    address: 3069
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 127
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3070:
+    name: Active days
+    address: 3070
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 127
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3089:
+    name: Number of years
+    address: 3089
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3090:
+    name: Months
+    address: 3090
+    size: 2
+    swap: word
+    control: number
+    number:
+      min: 0
+      max: 4095
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4100:
+    name: Blocking actions (ERS 3)
+    address: 4100
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4101:
+    name: Blocking actions (ERS 4)
+    address: 4101
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 2
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4145:
+    name: External adjustment, cooling climate system 1
+    address: 4145
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -10
+      max: 10
+    multiplier: 1
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4153:
+    name: External adjustment with room sensor, cooling climate system 1
+    address: 4153
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 5
+      max: 30
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4204:
+    name: Auto mode, start temperature for active cooling
+    address: 4204
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: 0
+      max: 40
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5271:
+    name: Shunted brine max. temp.
+    address: 5271
+    size: 1
+    control: number
+    number:
+      min: 0
+      max: 30
+    multiplier: 1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5328:
+    name: BT12 offset, heat pump 1
+    address: 5328
+    size: 1
+    signed: true
+    control: number
+    number:
+      min: -5
+      max: 5
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5352:
+    name: Minimum permitted speed (EB101 GP12)
+    address: 5352
+    size: 1
+    control: number
+    number:
+      min: 1
+      max: 50
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_19:
+    name: Holiday function status
+    address: 19
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_22:
+    name: Reset alarm
+    address: 22
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_120:
+    name: Floor drying
+    address: 120
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_153:
+    name: Shunt controlled additional heat
+    address: 153
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_158:
+    name: Step controlled additional heat accessory
+    address: 158
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_176:
+    name: System 1 (RMU)
+    address: 176
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_177:
+    name: System 2 (RMU)
+    address: 177
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_178:
+    name: System 3 (RMU)
+    address: 178
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_179:
+    name: System 4 (RMU)
+    address: 179
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_180:
+    name: Permit additional heat, heating
+    address: 180
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_181:
+    name: Permit heating
+    address: 181
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_182:
+    name: Permit cooling
+    address: 182
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_194:
+    name: Time format
+    address: 194
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_196:
+    name: Alarm action, lower room temperature
+    address: 196
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_198:
+    name: Auxiliary operation on alarm
+    address: 198
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_202:
+    name: Use room sensor climate system 1
+    address: 202
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_239:
+    name: Internal additional heat stepping mode
+    address: 239
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_705:
+    name: HW comfort shunt on/off
+    address: 705
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_709:
+    name: External cooling accessory
+    address: 709
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_710:
+    name: HW comfort additional heat
+    address: 710
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_726:
+    name: Cooling connected, climate system 1
+    address: 726
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_731:
+    name: ACS
+    address: 731
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_748:
+    name: Op. mode charge pump (EB101)
+    address: 748
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_758:
+    name: Additional heat after reversing valve
+    address: 758
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_760:
+    name: Heating (SG Ready)
+    address: 760
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_832:
+    name: Operating mode circulation pump cooling heat pump 1
+    address: 832
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_843:
+    name: Activated (Smart Price Adaption)
+    address: 843
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_849:
+    name: (SPA), cooling activated
+    address: 849
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_857:
+    name: Internal shunt controlled additional heat
+    address: 857
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_875:
+    name: Op. mode charge pump, cooling (EB101)
+    address: 875
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_932:
+    name: Heating connected, climate system 1
+    address: 932
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_933:
+    name: ERS 1
+    address: 933
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_998:
+    name: HTS 1
+    address: 998
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1015:
+    name: OPT
+    address: 1015
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1046:
+    name: External cooling accessory pump type
+    address: 1046
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1049:
+    name: Flow sensor activated X22
+    address: 1049
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1050:
+    name: Flow sensor activated X21
+    address: 1050
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1069:
+    name: PV panel affects heating (EME)
+    address: 1069
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1074:
+    name: Pump 4 (FLM)
+    address: 1074
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1075:
+    name: Pump 3 (FLM)
+    address: 1075
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1076:
+    name: Pump 2 (FLM)
+    address: 1076
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1080:
+    name: Cooling (FLM 4)
+    address: 1080
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1081:
+    name: Cooling (FLM 3)
+    address: 1081
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1082:
+    name: Cooling (FLM 2)
+    address: 1082
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1095:
+    name: AUX blocking (OPT)
+    address: 1095
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1096:
+    name: Outdoor air mixing
+    address: 1096
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1102:
+    name: Smart home room control
+    address: 1102
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1105:
+    name: Smart Energy Source
+    address: 1105
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1106:
+    name: Control method, smart energy source
+    address: 1106
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1109:
+    name: El. price, smart energy source
+    address: 1109
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1113:
+    name: El. price, smart energy source
+    address: 1113
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1115:
+    name: El. price, smart energy source
+    address: 1115
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1550:
+    name: Installed (EB101)
+    address: 1550
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1981:
+    name: HTS 2
+    address: 1981
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1982:
+    name: HTS 3
+    address: 1982
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1983:
+    name: HTS 4
+    address: 1983
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1998:
+    name: System 4 (RMU)
+    address: 1998
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_1999:
+    name: System 4 (RMU)
+    address: 1999
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2000:
+    name: System 4 (RMU)
+    address: 2000
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2001:
+    name: System 4 (RMU)
+    address: 2001
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2107:
+    name: Modbus TCP/IP Ext. (Solar PV)
+    address: 2107
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2108:
+    name: Modbus TCP/IP Ext.Include own consumption (Solar PV)
+    address: 2108
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2111:
+    name: External adjustment input, main unit (ECS1)
+    address: 2111
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2112:
+    name: External adjustment input (ECS2)
+    address: 2112
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2113:
+    name: External adjustment input (ECS3)
+    address: 2113
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2114:
+    name: External adjustment input (ECS4)
+    address: 2114
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2115:
+    name: External adjustment input (ECS5)
+    address: 2115
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2116:
+    name: External adjustment input (ECS6)
+    address: 2116
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2117:
+    name: External adjustment input (ECS7)
+    address: 2117
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2118:
+    name: External adjustment input (ECS8)
+    address: 2118
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2439:
+    name: Input on ECS1 affects ECS1
+    address: 2439
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2440:
+    name: Input on ECS1 affects ECS2
+    address: 2440
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2441:
+    name: Input on ECS1 affects ECS3
+    address: 2441
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2442:
+    name: Input on ECS1 affects ECS4
+    address: 2442
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2443:
+    name: Input on ECS1 affects ECS5
+    address: 2443
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2444:
+    name: Input on ECS1 affects ECS6
+    address: 2444
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2445:
+    name: Input on ECS1 affects ECS7
+    address: 2445
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2446:
+    name: Input on ECS1 affects ECS8
+    address: 2446
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2503:
+    name: External setting for adjustment migrated
+    address: 2503
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2666:
+    name: Cooling (Solar PV)
+    address: 2666
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2675:
+    name: AUX (Solar PV)
+    address: 2675
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2741:
+    name: AUX from Modbus
+    address: 2741
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2742:
+    name: The start guide has been run
+    address: 2742
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2744:
+    name: Changes have been made
+    address: 2744
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2820:
+    name: ERS 2
+    address: 2820
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2821:
+    name: ERS 3
+    address: 2821
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2822:
+    name: ERS 4
+    address: 2822
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2823:
+    name: ERS 4
+    address: 2823
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2824:
+    name: ERS 4
+    address: 2824
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2825:
+    name: ERS 4
+    address: 2825
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2826:
+    name: ERS 4
+    address: 2826
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_2827:
+    name: ERS 4
+    address: 2827
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3059:
+    name: Heating, auto
+    address: 3059
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3060:
+    name: Cooling, auto
+    address: 3060
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3088:
+    name: Period
+    address: 3088
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3096:
+    name: Show outdoor temperature
+    address: 3096
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3097:
+    name: Show indoor temperature
+    address: 3097
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_3986:
+    name: Disable emergency restart GP1
+    address: 3986
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4076:
+    name: ERS 2
+    address: 4076
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4077:
+    name: ERS 3
+    address: 4077
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4078:
+    name: ERS 4
+    address: 4078
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_4200:
+    name: Power at DOT, manual value
+    address: 4200
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5000:
+    name: Activate forced control
+    address: 5000
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5008:
+    name: Modbus external control
+    address: 5008
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5025:
+    name: Disable emergency restart GP1
+    address: 5025
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5268:
+    name: Shunted brine, accessory
+    address: 5268
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5295:
+    name: blockFreq 2 (EB101)
+    address: 5295
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5296:
+    name: blockFreq 1 (EB101)
+    address: 5296
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5326:
+    name: Audio signal on alarm
+    address: 5326
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5327:
+    name: Sound when pressing button
+    address: 5327
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5360:
+    name: Start fan de-icing (EB101)
+    address: 5360
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5368:
+    name: Defrost Requested EB101
+    address: 5368
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5392:
+    name: Disable emergency restart GP1
+    address: 5392
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+  nibe_holding_register_5458:
+    name: Cooling with solar energy surplus
+    address: 5458
+    control: switch
+    switch:
+      "on": 1
+      "off": 0
+    entity_category: config
+    entity_registry_enabled_default: True
+
+
+
+read_only_word:
+
+
+  nibe_input_register_0:
+    name: Relay status
+    address: 0
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1:
+    name: Current outdoor temperature (BT1)
+    address: 1
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    scan_interval: 60
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2:
+    name: Supply line (EP23-BT2)
+    address: 2
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    scan_interval: 10
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_3:
+    name: Supply line (EP22-BT2)
+    address: 3
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_4:
+    name: Supply line (EP21-BT2)
+    address: 4
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_21:
+    name: Collector in (AZ10-BT26)
+    address: 21
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_22:
+    name: Collector out (AZ10-BT27)
+    address: 22
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_31:
+    name: Return line (EQ1-BT65)
+    address: 31
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_37:
+    name: Average temperature (BT1)
+    address: 37
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_39:
+    name: External supply line (BT25)
+    address: 39
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_66:
+    name: Collector in (AZ13-BT26)
+    address: 66
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_67:
+    name: Collector in (AZ12-BT26)
+    address: 67
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_68:
+    name: Collector in (AZ11-BT26)
+    address: 68
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_69:
+    name: Collector out (AZ13-BT27)
+    address: 69
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_70:
+    name: Collector out (AZ12-BT27)
+    address: 70
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_71:
+    name: Collector out (AZ11-BT27)
+    address: 71
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_75:
+    name: Return line (EP23-BT3)
+    address: 75
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_76:
+    name: Return line (EP22-BT3)
+    address: 76
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_77:
+    name: Return line (EP21-BT3)
+    address: 77
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_78:
+    name: Return line (EP15-BT3)
+    address: 78
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_88:
+    name: Return line (BT71)
+    address: 88
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_90:
+    name: Collector (EQ1-BT57)
+    address: 90
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_91:
+    name: Heating dump (EQ1-BT75)
+    address: 91
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_94:
+    name: Supply line (EP47-BT2)
+    address: 94
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_95:
+    name: Supply line (EP46-BT2)
+    address: 95
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_96:
+    name: Supply line (EP45-BT2)
+    address: 96
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_97:
+    name: Supply line (EP44-BT2)
+    address: 97
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_98:
+    name: Return line (EP47-BT3)
+    address: 98
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_99:
+    name: Return line (EP46-BT3)
+    address: 99
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_100:
+    name: Return line (EP45-BT3)
+    address: 100
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_101:
+    name: Return line (EP44-BT3)
+    address: 101
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_109:
+    name: Room average temp. clim. system 8 (BT50)
+    address: 109
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_110:
+    name: Room average temp. clim. system 7 (BT50)
+    address: 110
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_111:
+    name: Room average temp. clim. system 6 (BT50)
+    address: 111
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_112:
+    name: Room average temp. clim. system 5 (BT50)
+    address: 112
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_113:
+    name: Room average temp. clim. system 4 (BT50)
+    address: 113
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_114:
+    name: Room average temp. clim. system 3 (BT50)
+    address: 114
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_115:
+    name: Room average temp. clim. system 2 (BT50)
+    address: 115
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_116:
+    name: Room average temp. clim. system 1 (BT50)
+    address: 116
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_134:
+    name: Relay status (ERS 1)
+    address: 134
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_135:
+    name: Fan speed (AZ30-GQ2)
+    address: 135
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_136:
+    name: Fan speed (AZ30-GQ3)
+    address: 136
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_141:
+    name: Max. compressor frequency, heating
+    address: 141
+    size: 1
+    multiplier: 0.01
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_160:
+    name: Extra cooling
+    address: 160
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_267:
+    name: Compressor, total time cooling, heat pump 1 (EP14)
+    address: 267
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_279:
+    name: Compressor, total time cooling, main unit (EP14)
+    address: 279
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_294:
+    name: Heat pump 8 requested compressor frequency
+    address: 294
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_295:
+    name: Heat pump 7 requested compressor frequency
+    address: 295
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_296:
+    name: Heat pump 6 requested compressor frequency
+    address: 296
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_297:
+    name: Heat pump 5 requested compressor frequency
+    address: 297
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_298:
+    name: Heat pump 4 requested compressor frequency
+    address: 298
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_299:
+    name: Heat pump 3 requested compressor frequency
+    address: 299
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_300:
+    name: Heat pump 2 requested compressor frequency
+    address: 300
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_301:
+    name: Heat pump 1 requested compressor frequency
+    address: 301
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_303:
+    name: Frost protection heat exchanger heat pump 8
+    address: 303
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_304:
+    name: Frost protection heat exchanger heat pump 7
+    address: 304
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_305:
+    name: Frost protection heat exchanger heat pump 6
+    address: 305
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_306:
+    name: Frost protection heat exchanger heat pump 5
+    address: 306
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_307:
+    name: Frost protection heat exchanger heat pump 4
+    address: 307
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_308:
+    name: Frost protection heat exchanger heat pump 3
+    address: 308
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_309:
+    name: Frost protection heat exchanger heat pump 2
+    address: 309
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_311:
+    name: Status (OPT)
+    address: 311
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_312:
+    name: Version (OPT)
+    address: 312
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_313:
+    name: OPT relay, modulation level
+    address: 313
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_315:
+    name: OPT operating time
+    address: 315
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_317:
+    name: Available compressors heating
+    address: 317
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_321:
+    name: Available compressors cooling
+    address: 321
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_337:
+    name: Supply temperature (BT64)
+    address: 337
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_338:
+    name: Heat pump functionality 2
+    address: 338
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_358:
+    name: Blocking (ERS 1)
+    address: 358
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_359:
+    name: AZ30-EB17
+    address: 359
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_374:
+    name: Selected fan speed
+    address: 374
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_385:
+    name: Seconds of blank time left, charge pump 8
+    address: 385
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_386:
+    name: Seconds of blank time left, charge pump 7
+    address: 386
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_387:
+    name: Seconds of blank time left, charge pump 6
+    address: 387
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_388:
+    name: Seconds of blank time left, charge pump 5
+    address: 388
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_389:
+    name: Seconds of blank time left, charge pump 4
+    address: 389
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_390:
+    name: Seconds of blank time left, charge pump 3
+    address: 390
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_391:
+    name: Seconds of blank time left, charge pump 2
+    address: 391
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_392:
+    name: Seconds of blank time left, charge pump 1
+    address: 392
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_400:
+    name: Alarm number from outdoor air heat pump (EB101)
+    address: 400
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_401:
+    name: Fan speed (EB101)
+    address: 401
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "rpm"
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_402:
+    name: Max fan speed (EB101)
+    address: 402
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "rpm"
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_403:
+    name: Min fan speed (EB101)
+    address: 403
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "rpm"
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_404:
+    name: Max compressor speed (EB101)
+    address: 404
+    size: 1
+    multiplier: 0.1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_405:
+    name: Min compressor speed (EB101)
+    address: 405
+    size: 1
+    multiplier: 0.1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_406:
+    name: Generated power heating (EB101)
+    address: 406
+    size: 1
+    multiplier: 0.1
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_407:
+    name: Time to defrosting (EB101)
+    address: 407
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_408:
+    name: Defrosting index (EB101)
+    address: 408
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_409:
+    name: Superheat reference EEV (EB101)
+    address: 409
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_410:
+    name: Superheat EEV (EB101)
+    address: 410
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_411:
+    name: EEV-ssh-error (EB101)
+    address: 411
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_412:
+    name: Superheat temp. reference EEV (EB101)
+    address: 412
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_413:
+    name: Set point value EEV (EB101)
+    address: 413
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_414:
+    name: EEV PV (EB101)
+    address: 414
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_415:
+    name: EEV-te-error average open (EB101)
+    address: 415
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_416:
+    name: Degree of opening EEV (EB101)
+    address: 416
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_417:
+    name: Superheat reference EVI (EB101)
+    address: 417
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_418:
+    name: Superheat EVI (EB101)
+    address: 418
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_419:
+    name: EEV-ssh-error (EVI)(EB101)
+    address: 419
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_420:
+    name: Superheat temp. reference EVI (EB101)
+    address: 420
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_421:
+    name: Set point value EVI (EB101)
+    address: 421
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_422:
+    name: EVI PV (EB101)
+    address: 422
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_423:
+    name: EEV-te-error average open in (EVI)(EB101)
+    address: 423
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_424:
+    name: Degree of opening EVI (EB101)
+    address: 424
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_550:
+    name: Low press (EB101 BP8 dew)
+    address: 550
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_551:
+    name: Hi press (EB101 BP9 dew)
+    address: 551
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_552:
+    name: Injection (EB101-BT81)
+    address: 552
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_553:
+    name: Pressure sensor, injection (EB101-BP11)
+    address: 553
+    size: 1
+    signed: true
+    multiplier: 0.1
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_554:
+    name: EVI pressure (EB101-EP14-BP11 dew)
+    address: 554
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_555:
+    name: Evaporator (EB101-BT84)
+    address: 555
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_556:
+    name: Fan status (EB101-EP14)
+    address: 556
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_557:
+    name: Fan rpm (EB101-EP14)
+    address: 557
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "rpm"
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_579:
+    name: Operating mode PV panels
+    address: 579
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_581:
+    name: EME lux mode without EME
+    address: 581
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_582:
+    name: Timer (EME)
+    address: 582
+    size: 1
+    multiplier: 0.0166666666666667
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_590:
+    name: Fan mode 4
+    address: 590
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_591:
+    name: Fan mode 3
+    address: 591
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_592:
+    name: Fan mode 2
+    address: 592
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_593:
+    name: Is the compressor accessible
+    address: 593
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_683:
+    name: Permit (undefined)
+    address: 683
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_684:
+    name: Permit (undefined)
+    address: 684
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_685:
+    name: Permit (undefined)
+    address: 685
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_686:
+    name: Permit (OPT 10) additional heat
+    address: 686
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_687:
+    name: Permit ext. imm. heater step
+    address: 687
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_688:
+    name: Permit int. imm. heater step
+    address: 688
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_689:
+    name: Permit shunted additional heat
+    address: 689
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_690:
+    name: Permit prioritised additional heat
+    address: 690
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_698:
+    name: Permit (EB101-EP15)
+    address: 698
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_707:
+    name: Permit (EB101-EP14)
+    address: 707
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_709:
+    name: Smart energy source, priority 7, start DM
+    address: 709
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_711:
+    name: Smart energy source, priority 6, start DM
+    address: 711
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_713:
+    name: Smart energy source, priority 5, start DM
+    address: 713
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_715:
+    name: Smart energy source, priority 4, start DM
+    address: 715
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_717:
+    name: Smart energy source, priority 3, start DM
+    address: 717
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_719:
+    name: Smart energy source, priority 2, start DM
+    address: 719
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_721:
+    name: Smart energy source, priority 1, start DM
+    address: 721
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_723:
+    name: Smart energy source, priority 7, stop DM
+    address: 723
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_725:
+    name: Smart energy source, priority 6, stop DM
+    address: 725
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_727:
+    name: Smart energy source, priority 5, stop DM
+    address: 727
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_729:
+    name: Smart energy source, priority 4, stop DM
+    address: 729
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_731:
+    name: Smart energy source, priority 3, stop DM
+    address: 731
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_733:
+    name: Smart energy source, priority 2, stop DM
+    address: 733
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_735:
+    name: Smart energy source, priority 1, stop DM
+    address: 735
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_737:
+    name: Smart energy source, DM minimum value
+    address: 737
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_745:
+    name: External guide status
+    address: 745
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_746:
+    name: Test guide value
+    address: 746
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_922:
+    name: Superheat temp. reference EEV (EB101)
+    address: 922
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_992:
+    name: Outd. air heat pump, inverter, limits
+    address: 992
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_993:
+    name: Outd. air heat pump, inverter, speed reducing
+    address: 993
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1008:
+    name: Has one phase (EB101)
+    address: 1008
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1009:
+    name: Serial index (EB101)
+    address: 1009
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1017:
+    name: Calculated supply climate system 1
+    address: 1017
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1018:
+    name: Frost protection status
+    address: 1018
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1019:
+    name: Cooling status
+    address: 1019
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1025:
+    name: Total run time additional heat
+    address: 1025
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1028:
+    name: Priority
+    address: 1028
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      10: "Off"
+      20: "Hot water"
+      30: "Heating"
+      40: "Pool"
+      60: "Cooling"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1029:
+    name: Operating mode internal add. heat
+    address: 1029
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1033:
+    name: Oper. mode shunt climate system 1
+    address: 1033
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1034:
+    name: Operating. mode shunt controlled additional heat
+    address: 1034
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      10: "Off"
+      20: "Active"
+      30: "Passive"
+      40: "Opening"
+      50: "Closing"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1037:
+    name: Fan mode 1
+    address: 1037
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1053:
+    name: Blocking cooling
+    address: 1053
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1057:
+    name: External adjustment climate system 1
+    address: 1057
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1058:
+    name: External blocking
+    address: 1058
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1059:
+    name: Blocked
+    address: 1059
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1060:
+    name: External blocking, active cooling (HPAC)
+    address: 1060
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1061:
+    name: External blocking, passive cooling (HPAC)
+    address: 1061
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1062:
+    name: Step controlled add. heat blocking
+    address: 1062
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1066:
+    name: External heating medium pump (GP10) status
+    address: 1066
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Off"
+      1: "On"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1069:
+    name: Total HW run time additional heat
+    address: 1069
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1079:
+    name: Relay status (HPAC)
+    address: 1079
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1108:
+    name: Docked compressors heating
+    address: 1108
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1120:
+    name: Current status
+    address: 1120
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1122:
+    name: Functionality, heat pump (EP14)
+    address: 1122
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1124:
+    name: Active heat pumps
+    address: 1124
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1125:
+    name: Functionality, heat pump (EP15)
+    address: 1125
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1129:
+    name: Operating mode HW comfort
+    address: 1129
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1130:
+    name: Operating mode HW comfort additional heat
+    address: 1130
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1131:
+    name: Blocked
+    address: 1131
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1132:
+    name: Blocked
+    address: 1132
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1451:
+    name: Version (EB101)
+    address: 1451
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1452:
+    name: Heat pump type (EB101)
+    address: 1452
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1453:
+    name: Compressor size (EB101)
+    address: 1453
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1475:
+    name: Return line (EB101-BT3)
+    address: 1475
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1478:
+    name: Condenser sensor, supply line (EB101-BT12)
+    address: 1478
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1479:
+    name: Discharge (EB101-BT14)
+    address: 1479
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1480:
+    name: Liquid line (EB101-BT15)
+    address: 1480
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1481:
+    name: Suction gas (EB101-BT17)
+    address: 1481
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1482:
+    name: Compressor sensor (EB101-BT29)
+    address: 1482
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1484:
+    name: Compressor status (EB101)
+    address: 1484
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1485:
+    name: Compressor, time to start (EB101-EP14)
+    address: 1485
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "min"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1486:
+    name: Relay status (EB101-EP14)
+    address: 1486
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1489:
+    name: Compressor, number of starts (EB101-EP14)
+    address: 1489
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1491:
+    name: Compressor, oper. time, total (EB101-EP14)
+    address: 1491
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1495:
+    name: Alarm number (EB101-EP14)
+    address: 1495
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1555:
+    name: Compressor, requested (EB101-EP15)
+    address: 1555
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1556:
+    name: Compressor, requested (EB101-EP14)
+    address: 1556
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1559:
+    name: Cooling blocking
+    address: 1559
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1567:
+    name: Calculated cooling supply climate system 1
+    address: 1567
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1568:
+    name: Status (ACS)
+    address: 1568
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      3: "Passive"
+      7: "Active"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1569:
+    name: Status, heating dumping (ACS)
+    address: 1569
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      10: "Off"
+      20: "Opening"
+      30: "Closing"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1570:
+    name: Status, cooling dumping (ACS)
+    address: 1570
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      10: "Off"
+      20: "Opening"
+      30: "Closing"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1572:
+    name: Used compressors heating
+    address: 1572
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1579:
+    name: Cooling, compressor only
+    address: 1579
+    size: 2
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1585:
+    name: Heating, compressor only
+    address: 1585
+    size: 2
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1588:
+    name: Used compressors cooling
+    address: 1588
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1621:
+    name: Outdoor temperature (EB101-BT28)
+    address: 1621
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1622:
+    name: Evaporator (EB101-BT16)
+    address: 1622
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1636:
+    name: Charge pump speed (EB101-GP12)
+    address: 1636
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1638:
+    name: Frost protection heat exchanger heat pump 1
+    address: 1638
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1693:
+    name: Operating mode extra additional heat
+    address: 1693
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1694:
+    name: Docked compressors cooling
+    address: 1694
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1793:
+    name: BP4, unprocessed (EB101-EP15)
+    address: 1793
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1795:
+    name: Low pressure (EB101-EP15-BP8)
+    address: 1795
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "bar"
+    device_class: pressure
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1797:
+    name: Prot. status (EB101-EP15)
+    address: 1797
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1798:
+    name: Defrosting (EB101-EP15)
+    address: 1798
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1799:
+    name: Power (EB101-EP15)
+    address: 1799
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1800:
+    name: BP4, unprocessed (EB101-EP14)
+    address: 1800
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1802:
+    name: Low pressure (EB101-BP8)
+    address: 1802
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "bar"
+    device_class: pressure
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1803:
+    name: Current compressor frequency (EB101)
+    address: 1803
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1804:
+    name: Protection mode (EB101)
+    address: 1804
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1805:
+    name: Defrosting (EB101)
+    address: 1805
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Off"
+      1: "Active"
+      2: "Passive"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1806:
+    name: Power (EB101-EP14)
+    address: 1806
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1826:
+    name: Climate system 1 (HMP)
+    address: 1826
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1830:
+    name: ACS EQ1-QN12
+    address: 1830
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Closed"
+      1: "Open"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1831:
+    name: ACS EQ1-GP20
+    address: 1831
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Off"
+      1: "On"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1833:
+    name: Passive cooling pump (GP13)
+    address: 1833
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Off"
+      1: "On"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1853:
+    name: Requested compressor frequency (EB101-EP15)
+    address: 1853
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1854:
+    name: Requested compressor frequency (EB101)
+    address: 1854
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1855:
+    name: Requested compressor frequency (EP15)
+    address: 1855
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1856:
+    name: Requested compressor frequency
+    address: 1856
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "Hz"
+    device_class: frequency
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1902:
+    name: Low press. sensor, unprocessed (EB101-EP14)
+    address: 1902
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1903:
+    name: Current sensor (EB101-EP14)
+    address: 1903
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1911:
+    name: Operating mode (SG Ready)
+    address: 1911
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1912:
+    name: SG ready, input A
+    address: 1912
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1913:
+    name: SG ready, input B
+    address: 1913
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1917:
+    name: Cooling offset (SPA)
+    address: 1917
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1918:
+    name: Operating mode (Smart Price Adaption)
+    address: 1918
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1966:
+    name: Evaporator 2 (EB101-EP14-BT16)
+    address: 1966
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1967:
+    name: Temperature, inverter (EB101-EP14)
+    address: 1967
+    size: 1
+    signed: true
+    multiplier: 0.1
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1968:
+    name: fan speed (EB101-EP14)
+    address: 1968
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1975:
+    name: Alarm number
+    address: 1975
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1976:
+    name: Non module-specific alarm numbers
+    address: 1976
+    size: 1
+    signed: true
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_1977:
+    name: Floor drying ongoing time.
+    address: 1977
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2147:
+    name: Version, inverter (EB101)
+    address: 2147
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2158:
+    name: Last defrost, heat pump 1
+    address: 2158
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2168:
+    name: Fan mode 5
+    address: 2168
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2169:
+    name: Fan mode 6
+    address: 2169
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2170:
+    name: Fan mode 7
+    address: 2170
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2171:
+    name: Fan mode 8
+    address: 2171
+    size: 1
+    multiplier: 1
+    unit_of_measurement: "%"
+    device_class: power_factor
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2174:
+    name: Blocked compressors
+    address: 2174
+    size: 2
+    swap: word
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2176:
+    name: Current power
+    address: 2176
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2178:
+    name: Total average power (Solar PV)
+    address: 2178
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2180:
+    name: Total energy
+    address: 2180
+    size: 2
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2182:
+    name: Total oper. time ext. add. heat, heating
+    address: 2182
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2184:
+    name: Total HW run time additional heat
+    address: 2184
+    size: 2
+    signed: true
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 1
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2195:
+    name: Class 1 alarm
+    address: 2195
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "No alarm"
+      1: "Active alarm"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2283:
+    name: Energy log - Produced energy for heating over the past hour
+    address: 2283
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2289:
+    name: Energy log - Produced energy for cooling over the past hour
+    address: 2289
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2291:
+    name: Energy log - Used energy for heating over the past hour
+    address: 2291
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2297:
+    name: Energy log - Used energy for cooling over the past hour
+    address: 2297
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2299:
+    name: Energy log - Used energy by additional heater for heating over the past hour
+    address: 2299
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2305:
+    name: Energy log - Current power consumption
+    address: 2305
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2335:
+    name: Compressor, total time energy storage, main unit (EP14)
+    address: 2335
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2337:
+    name: Compressor, total time energy storage, main unit (EP15)
+    address: 2337
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2339:
+    name: Compressor, total time energy storage, heat pump 1 (EP14)
+    address: 2339
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2341:
+    name: Compressor, total time energy storage, heat pump 1 (EP15)
+    address: 2341
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2343:
+    name: Compressor, total time energy storage, heat pump 2 (EP14)
+    address: 2343
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2345:
+    name: Compressor, total time energy storage, heat pump 2 (EP15)
+    address: 2345
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2347:
+    name: Compressor, total time energy storage, heat pump 3 (EP14)
+    address: 2347
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2349:
+    name: Compressor, total time energy storage, heat pump 3 (EP15)
+    address: 2349
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2351:
+    name: Compressor, total time energy storage, heat pump 4 (EP14)
+    address: 2351
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2353:
+    name: Compressor, total time energy storage, heat pump 4 (EP15)
+    address: 2353
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2355:
+    name: Compressor, total time energy storage, heat pump 5 (EP14)
+    address: 2355
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2357:
+    name: Compressor, total time energy storage, heat pump 5 (EP15)
+    address: 2357
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2359:
+    name: Compressor, total time energy storage, heat pump 6 (EP14)
+    address: 2359
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2361:
+    name: Compressor, total time energy storage, heat pump 6 (EP15)
+    address: 2361
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2363:
+    name: Compressor, total time energy storage, heat pump 7 (EP14)
+    address: 2363
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2365:
+    name: Compressor, total time energy storage, heat pump 7 (EP15)
+    address: 2365
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2367:
+    name: Compressor, total time energy storage, heat pump 8 (EP14)
+    address: 2367
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2369:
+    name: Compressor, total time energy storage, heat pump 8 (EP15)
+    address: 2369
+    size: 2
+    swap: word
+    multiplier: 1
+    unit_of_measurement: "h"
+    device_class: duration
+    state_class: measurement
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2408:
+    name: Energy log - Current power consumption, components
+    address: 2408
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2410:
+    name: Operating mode, shunt controlled brine (QN41)
+    address: 2410
+    size: 1
+    multiplier: 1
+    precision: 0
+    map:
+      0: "Closed"
+      1: "Open"
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2413:
+    name: EEV Control Mode (EB101)
+    address: 2413
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2421:
+    name: EEV State (EB101)
+    address: 2421
+    size: 1
+    multiplier: 1
+    precision: 0
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  nibe_input_register_2727:
+    name: Current power
+    address: 2727
+    size: 2
+    swap: word
+    multiplier: 0.01
+    unit_of_measurement: "kW"
+    device_class: power
+    state_class: measurement
+    precision: 2
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+
+
+
+#check!
+
+
+
+
+
+
+
+
+
+read_only_boolean:

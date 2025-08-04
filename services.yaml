@@ -1,0 +1,23 @@
+# Service definitions for Modbus Local Gateway integration
+set_scan_interval:
+  name: Set scan interval
+  description: Adjust polling frequency for a Modbus entity based on statistical recommendations.
+  target:
+    entity:
+      domain: sensor, binary_sensor, switch, number, select, text
+  fields:
+    entity_id:
+      name: Entity
+      description: Entity ID to adjust scan interval for
+      required: true
+      selector:
+        entity: {}
+    scan_interval:
+      name: Scan interval
+      description: New polling interval in seconds
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 3600
+          unit_of_measurement: seconds

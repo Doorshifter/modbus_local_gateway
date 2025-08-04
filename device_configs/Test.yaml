@@ -1,0 +1,129 @@
+device:
+  manufacturer: Test
+  model: Test Model (DO NOT USE)
+
+read_write_boolean:
+  coil1:
+    name: coil1
+    address: 0x0001
+    control: switch
+
+  coil2:
+    name: coil2
+    address: 0x0001
+    scan_interval: 45
+
+  coil3:
+    name: coil3
+    address: 0x0001
+    control: switch
+    switch:
+      "on": False
+      "off": True
+
+  coil4:
+    name: coil4
+    address: 0x0001
+    control: binary_sensor
+    "on": False
+    "off": True
+
+read_only_boolean:
+  di1:
+    name: di1
+    address: 0x0003
+    device_class: power
+    scan_interval: 60
+
+read_write_word:
+  nibe_degree_minutes_h_11_t:
+    name: Degree minutes t
+    control: number
+    number:
+      min: -3000.0
+      max: 3000.0
+    address: 11
+    signed: true
+    size: 2
+    swap: word
+    multiplier: 0.1
+    unit_of_measurement: "DM"
+    state_class: measurement
+    precision: 1
+    scan_interval: 2
+
+  on_off:
+    name: Remote On/Off
+    address: 0
+    control: switch
+    icon: mdi:power
+    switch:
+      "off": 0
+      "on": 1
+
+  nibe_energy_lo:
+    name: Energy LO (2180)
+    address: 2180
+    size: 1
+    precision: 0
+    entity_category: diagnostic
+
+  nibe_energy_hi:
+    name: Energy HI (2181)
+    address: 2181
+    size: 1
+    precision: 0
+    entity_category: diagnostic
+    max_change: 5
+
+  nibe_total_energy_i_2180:
+    name: Total energy
+    address: 2180
+    size: 2
+    float: true
+    swap: word_byte
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+    precision: 2
+    entity_category: diagnostic
+
+  hotwater_demand:
+    name: "Heißwasser Nachfrage"
+    address: 0x0003
+    bits: 1
+    device_class: heat
+    control: binary_sensor
+    icon: mdi:water-boiler
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  heating_demand:
+    name: "Heizung Nachfrage"
+    address: 0x0003
+    bits: 1
+    shift_bits: 1
+    device_class: heat
+    control: binary_sensor
+    icon: mdi:heating-coil
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  antilegionella_on:
+    name: "Antilegionellen Aktiv"
+    address: 0x0003
+    bits: 1
+    shift_bits: 4
+    device_class: running
+    control: binary_sensor
+    icon: mdi:virus-off
+    entity_category: diagnostic
+    entity_registry_enabled_default: True
+
+  register_1:
+    name: "Boolean Register"
+    address: 0x0004
+    bits: 1
+    shift_bits: 4
+    device_class: running
+    control: binary_sensor
