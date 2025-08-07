@@ -9,7 +9,7 @@ import time
 from dataclasses import dataclass
 from typing import Optional, Any
 from .entity_management.base import ModbusEntityDescription
-from .statistics import EntityStatisticsTracker
+from .statistics.statistics_tracker import StatisticsTracker as EntityStatisticsTracker
 
 @dataclass
 class ModbusContext:

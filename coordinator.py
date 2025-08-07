@@ -34,7 +34,7 @@ from .context import ModbusContext
 from .conversion import Conversion
 from .entity_management.const import ModbusDataType
 from .const import DOMAIN
-from .statistics import EntityStatisticsTracker, StatisticMetric
+from .statistics.statistics_tracker import StatisticsTracker as EntityStatisticsTracker, StatisticMetric
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -381,6 +381,89 @@ class ModbusCoordinator(DataUpdateCoordinator):
             "Total polling jobs scheduled: %d", len(self._polling_jobs)
         )
 
+    def update_entity_scan_interval(self, entity_id: str, new_interval: int) -> bool:
+        """Update scan interval for a specific entity and reschedule polling."""
+        # Find the entity by ID
+        target_entity = None
+        for entity in self.entities:
+            if hasattr(entity, "desc") and entity.desc and entity.desc.key == entity_id:
+                target_entity = entity
+                break
+                
+        if not target_entity:
+            _LOGGER.warning(f"Could not find entity '{entity_id}' to update scan interval")
+            return False
+        
+        # Update the entity's scan interval
+        old_interval = getattr(target_entity, "scan_interval", None)
+        if old_interval == new_interval:
+            # No change needed
+            return False
+            
+        target_entity.scan_interval = new_interval
+        _LOGGER.info(
+            f"Updated scan interval for '{entity_id}' from {old_interval} to {new_interval} seconds"
+        )
+        
+        # Reschedule dynamic updates
+        self._schedule_dynamic_updates()
+        
+        return True
+    
+    async def apply_recommended_intervals(self) -> Dict[str, Any]:
+        """Apply recommended scan intervals from statistics system to all entities."""
+        if not hasattr(self, "entities") or not self.entities:
+            return {"success": False, "message": "No entities configured"}
+            
+        from .statistics.dynamic_interval import DynamicIntervalManager
+        interval_manager = DynamicIntervalManager.get_instance()
+        
+        updates = 0
+        entities_processed = 0
+        
+        for entity in self.entities:
+            if not hasattr(entity, "desc") or not entity.desc:
+                continue
+                
+            entity_id = entity.desc.key
+            if not entity_id:
+                continue
+                
+            entities_processed += 1
+            
+            # Get recommended interval
+            recommended_interval = interval_manager.get_recommended_interval(
+                entity_id, 
+                time.time(),
+                force_recalculate=True
+            )
+            
+            if recommended_interval:
+                # Apply if substantially different (avoid minor fluctuations)
+                current_interval = getattr(entity, "scan_interval", None)
+                
+                # Only update if:
+                # 1. Current interval doesn't exist, or
+                # 2. New interval is at least 20% different
+                if (current_interval is None or 
+                    abs(recommended_interval - current_interval) / current_interval > 0.2):
+                    
+                    entity.scan_interval = recommended_interval
+                    updates += 1
+                    _LOGGER.info(
+                        f"Applied recommended scan interval for '{entity_id}': {recommended_interval}s"
+                    )
+        
+        # Reschedule all updates if we made any changes
+        if updates > 0:
+            self._schedule_dynamic_updates()
+            
+        return {
+            "success": True,
+            "updates": updates,
+            "entities_processed": entities_processed,
+            "system_stats": interval_manager.get_statistics()
+        }
     async def _dynamic_update(self, entities_to_update: List[ModbusContext]) -> None:
         """Update specific entities with statistics tracking and response time capture."""
         async with self._update_lock:

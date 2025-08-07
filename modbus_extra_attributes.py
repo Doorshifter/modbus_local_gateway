@@ -3,7 +3,7 @@
 import logging
 import time
 from typing import Any, Dict, Optional
-from .statistics import StatisticMetric
+
 
 _LOGGER = logging.getLogger(__name__)
 

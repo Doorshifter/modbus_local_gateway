@@ -12,6 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_FILENAME
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from pathlib import Path
 
 from .const import (
     DOMAIN,
@@ -23,8 +24,10 @@ from .const import (
 from .coordinator import ModbusCoordinator
 from .entity_management.device_loader import create_device_info
 from .tcp_client import AsyncModbusTcpClientGateway
-from .statistics import EntityStatisticsTracker
-from .service import async_setup_services
+from .statistics.self_healing import SELF_HEALING_SYSTEM
+from .statistics.resource_adaptation import RESOURCE_ADAPTER
+from .statistics import STATISTICS_MANAGER  # This is fine as it's defined in statistics/__init__.py
+from .services import async_setup_services
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -61,11 +64,37 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.exception("Unexpected error loading device info YAML: %s", e)
         raise ConfigEntryNotReady(f"Error loading device info: {e}") from e
 
+    # STEP 1.5: Initialize self-healing and resource adaptation systems
+    config_dir = hass.config.path()
+    storage_path = Path(config_dir) / "modbus_statistics"
+    try:
+        SELF_HEALING_SYSTEM.initialize(storage_path)
+        _LOGGER.info("Self-healing system initialized with storage path: %s", storage_path)
+        
+        # Run initial health check in the background
+        hass.async_create_task(
+            hass.async_add_executor_job(SELF_HEALING_SYSTEM.check_and_heal_system, False)
+        )
+        
+        # Measure system capabilities
+        hass.async_create_task(
+            hass.async_add_executor_job(RESOURCE_ADAPTER.measure_system_capabilities)
+        )
+    except Exception as e:
+        _LOGGER.warning("Failed to initialize self-healing system: %s", e)
+        # Non-critical error, continue setup
+
     # STEP 2: Create or get the Modbus TCP client instance
     try:
+        # Apply resource adaptation recommendations if available
+        capabilities = RESOURCE_ADAPTER.measure_system_capabilities()
+        throughput = RESOURCE_ADAPTER.get_throughput_recommendation()
+        max_registers_per_second = throughput.get("polls_per_second", None)
+        
         client = AsyncModbusTcpClientGateway.async_get_client_connection(
             host=entry.data[CONF_HOST],
-            port=entry.data[CONF_PORT]
+            port=entry.data[CONF_PORT],
+            max_registers_per_second=max_registers_per_second
         )
         if not client:
             raise ConfigEntryNotReady("Failed to create Modbus client")

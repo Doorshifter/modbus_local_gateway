@@ -10,6 +10,7 @@ from ..context import ModbusContext
 from ..coordinator import ModbusCoordinator
 from ..statistics import StatisticMetric
 from ..const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+from ..statistics import STATISTICS_MANAGER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -214,3 +215,24 @@ class ModbusCoordinatorEntity(CoordinatorEntity):
                     response_time=None,
                     value=None
                 )
+
+def register_entity_for_advanced_statistics(entity):
+    """Register an entity with the statistics manager."""
+    if hasattr(entity, "entity_id"):
+        entity_id = entity.entity_id
+        # Get scan interval from entity
+        scan_interval = getattr(entity, "_get_scan_interval", lambda: 30)()
+        
+        # Register with statistics manager
+        STATISTICS_MANAGER.register_entity(entity_id, scan_interval)
+
+        # Process any already collected data
+        if hasattr(entity, "_modbus_context") and hasattr(entity._modbus_context, "statistics"):
+            stats = entity._modbus_context.statistics
+            if hasattr(stats, "recent_values") and stats.recent_values:
+                # Add recent values to correlation tracking
+                for value in stats.recent_values:
+                    STATISTICS_MANAGER.record_value(entity_id, value)
+        
+        return True
+    return False

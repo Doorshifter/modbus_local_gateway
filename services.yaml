@@ -1,23 +1,627 @@
-# Service definitions for Modbus Local Gateway integration
+# Modbus Local Gateway - Service Definitions
+
 set_scan_interval:
   name: Set scan interval
-  description: Adjust polling frequency for a Modbus entity based on statistical recommendations.
-  target:
-    entity:
-      domain: sensor, binary_sensor, switch, number, select, text
+  description: >-
+    Set a custom polling interval for a specific Modbus entity.
+    This allows you to fine-tune how frequently the gateway polls each entity.
   fields:
     entity_id:
       name: Entity
-      description: Entity ID to adjust scan interval for
+      description: Entity ID of the Modbus entity to configure
       required: true
+      example: "sensor.modbus_supply_temperature"
       selector:
-        entity: {}
+        entity:
+          integration: modbus_local_gateway
     scan_interval:
       name: Scan interval
-      description: New polling interval in seconds
+      description: Polling interval in seconds (between 1 and 3600)
       required: true
+      default: 30
+      example: 60
       selector:
         number:
           min: 1
           max: 3600
+          step: 1
           unit_of_measurement: seconds
+  target:
+    entity:
+      integration: modbus_local_gateway
+  example: |
+    # Set a temperature sensor to update every 60 seconds
+    service: modbus_local_gateway.set_scan_interval
+    data:
+      entity_id: sensor.modbus_supply_temperature
+      scan_interval: 60
+
+    # Set a rarely changing entity to poll less frequently
+    service: modbus_local_gateway.set_scan_interval
+    data:
+      entity_id: sensor.modbus_serial_number
+      scan_interval: 3600
+
+analyze_correlations:
+  name: Analyze correlations
+  description: >-
+    Analyze value change correlations between Modbus entities to identify related entities.
+    This helps optimize polling by grouping related entities that typically change together.
+    Results are stored in entity attributes for use in automations and polling optimization.
+  fields:
+    force:
+      name: Force analysis
+      description: Force a complete reanalysis even if recent analysis data exists
+      required: false
+      default: true
+      selector:
+        boolean:
+    threshold:
+      name: Correlation threshold
+      description: >-
+        Minimum correlation value (0.1-0.99) to consider entities related.
+        Higher values create tighter clusters with stronger relationships.
+        Lower values group more entities together with weaker relationships.
+      required: false
+      default: 0.6
+      selector:
+        number:
+          min: 0.1
+          max: 0.99
+          step: 0.05
+  example: |
+    # Run correlation analysis with default settings
+    service: modbus_local_gateway.analyze_correlations
+    
+    # Run correlation analysis with a higher threshold for stricter grouping
+    service: modbus_local_gateway.analyze_correlations
+    data:
+      threshold: 0.8
+      force: true
+
+configure_pattern_detection:
+  name: Configure pattern detection
+  description: >-
+    Configure how much influence a specific entity has on pattern detection.
+    Entities with higher importance have more influence on determining
+    operating patterns, which affects polling optimization.
+  fields:
+    entity_id:
+      name: Entity
+      description: Entity to configure for pattern detection
+      required: true
+      selector:
+        entity:
+          integration: modbus_local_gateway
+    importance:
+      name: Importance factor
+      description: >-
+        How strongly this entity influences pattern detection (1-10).
+        Higher values (8-10) make this entity a major indicator for pattern changes.
+        Lower values (1-3) reduce this entity's influence on pattern detection.
+      required: false
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 10
+          step: 1
+  example: |
+    # Make a temperature sensor highly influential in pattern detection
+    service: modbus_local_gateway.configure_pattern_detection
+    data:
+      entity_id: sensor.modbus_supply_temperature
+      importance: 9
+      
+    # Reduce influence of a status indicator that changes often but isn't significant
+    service: modbus_local_gateway.configure_pattern_detection
+    data:
+      entity_id: sensor.modbus_status_code
+      importance: 2
+
+optimize_scan_intervals:
+  name: Optimize scan intervals
+  description: >-
+    Automatically optimize polling intervals for all Modbus entities based on:
+    1. Statistical change patterns and value stability
+    2. Detected operating patterns and correlations
+    3. Entity importance and relationships
+    
+    This service can either suggest optimizations (default) or apply them immediately.
+    After running, each entity's statistics will show the recommended scan interval.
+  fields:
+    apply_changes:
+      name: Apply changes
+      description: >-
+        If true, optimized intervals will be applied immediately.
+        If false, recommendations are returned but not applied.
+      required: false
+      default: false
+      selector:
+        boolean:
+    max_registers_per_second:
+      name: Max registers per second
+      description: >-
+        Optional limit for registers polled per second across all entities.
+        Use this to limit overall system load on your Modbus device.
+        Leave empty to use unlimited (or existing configuration).
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 1000
+          step: 1
+          unit_of_measurement: regs/sec
+    min_interval:
+      name: Minimum interval
+      description: >-
+        Minimum allowed polling interval in seconds.
+        No entity will be polled more frequently than this.
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 300
+          step: 1
+          unit_of_measurement: seconds
+    max_interval:
+      name: Maximum interval
+      description: >-
+        Maximum allowed polling interval in seconds.
+        No entity will be polled less frequently than this.
+      required: false
+      selector:
+        number:
+          min: 60
+          max: 3600
+          step: 60
+          unit_of_measurement: seconds
+  example: |
+    # Get optimization recommendations without applying them
+    service: modbus_local_gateway.optimize_scan_intervals
+    
+    # Apply optimized intervals with a system-wide limit
+    service: modbus_local_gateway.optimize_scan_intervals
+    data:
+      apply_changes: true
+      max_registers_per_second: 50
+      min_interval: 10
+      max_interval: 1800
+      
+export_statistics:
+  name: Export statistics
+  description: >-
+    Export statistics data to a JSON file.
+    This includes pattern detection data, correlation analysis,
+    entity statistics, and interval optimization history.
+  fields:
+    target_path:
+      name: Target path
+      description: >-
+        Path to save the exported data.
+        Defaults to /config/modbus_statistics_export_[timestamp].json
+      required: false
+      example: "/config/modbus_export.json"
+      selector:
+        text:
+    data_type:
+      name: Data type
+      description: >-
+        Type of data to export. If not specified, exports all data.
+      required: false
+      default: "all"
+      selector:
+        select:
+          options:
+            - "all"
+            - "entity_stats"
+            - "patterns"
+            - "clusters"
+            - "correlation"
+            - "interval_history"
+  example: |
+    # Export all statistics data
+    service: modbus_local_gateway.export_statistics
+    
+    # Export only pattern detection data to a specific path
+    service: modbus_local_gateway.export_statistics
+    data:
+      target_path: "/config/modbus_patterns_export.json"
+      data_type: "patterns"
+
+clear_statistics:
+  name: Clear statistics
+  description: >-
+    Clear statistics data from persistent storage.
+    This allows you to reset the system if needed.
+  fields:
+    data_type:
+      name: Data type
+      description: >-
+        Type of data to clear. If not specified, clears all data.
+      required: false
+      selector:
+        select:
+          options:
+            - "all"
+            - "entity_stats"
+            - "patterns"
+            - "clusters"
+            - "correlation"
+            - "interval_history"
+  example: |
+    # Clear all statistics data
+    service: modbus_local_gateway.clear_statistics
+    
+    # Clear only correlation data
+    service: modbus_local_gateway.clear_statistics
+    data:
+      data_type: "correlation"
+
+get_statistics_storage_info:
+  name: Get statistics storage info
+  description: >-
+    Get information about the statistics storage system,
+    including file sizes, item counts, and last update times.
+  example: |
+    # Get storage information
+    service: modbus_local_gateway.get_statistics_storage_info
+
+# New services added from service_extension.py
+run_self_healing:
+  name: Run self healing
+  description: >-
+    Run the self-healing system to detect and fix issues with the Modbus statistics data.
+    This includes repairing corrupted files, removing orphaned entities, and ensuring data integrity.
+  fields:
+    full_check:
+      name: Full check
+      description: >-
+        If true, performs a comprehensive system check.
+        If false, performs only critical checks to save resources.
+      required: false
+      default: true
+      selector:
+        boolean:
+  example: |
+    # Run a quick essential health check
+    service: modbus_local_gateway.run_self_healing
+    data:
+      full_check: false
+    
+    # Run comprehensive system validation and healing
+    service: modbus_local_gateway.run_self_healing
+    data:
+      full_check: true
+
+resource_adaptation:
+  name: Resource adaptation
+  description: >-
+    Update system resource adaptation settings and get recommendations based on
+    available CPU and memory resources. This helps optimize performance on
+    different hardware while maintaining reliability.
+  fields:
+    force_update:
+      name: Force update
+      description: >-
+        If true, forces an immediate recalculation of system capabilities.
+        If false, returns cached values if available.
+      required: false
+      default: false
+      selector:
+        boolean:
+  example: |
+    # Get current resource adaptation settings
+    service: modbus_local_gateway.resource_adaptation
+    
+    # Force recalculation of system capabilities
+    service: modbus_local_gateway.resource_adaptation
+    data:
+      force_update: true
+
+# New performance optimization services
+run_performance_optimization:
+  name: Run performance optimization
+  description: >-
+    Run the performance optimization system to improve overall system efficiency.
+    This uses machine learning to optimize polling intervals, clustering, and pattern detection
+    based on observed entity behavior and system performance metrics.
+  fields:
+    type:
+      name: Optimization type
+      description: >-
+        Type of optimization to run. Quick is faster but focuses only on intervals,
+        while Full runs all optimization strategies but takes longer.
+      required: false
+      default: "quick"
+      selector:
+        select:
+          options:
+            - "quick"
+            - "full"
+    strategy:
+      name: Specific strategy
+      description: >-
+        Optionally run only a specific optimization strategy instead of all strategies.
+        If specified, the type parameter is ignored.
+      required: false
+      selector:
+        select:
+          options:
+            - "interval"
+            - "cluster"
+            - "pattern"
+  example: |
+    # Run a quick optimization (interval only)
+    service: modbus_local_gateway.run_performance_optimization
+    data:
+      type: "quick"
+    
+    # Run a full optimization (all strategies)
+    service: modbus_local_gateway.run_performance_optimization
+    data:
+      type: "full"
+      
+    # Run just the pattern detection optimization
+    service: modbus_local_gateway.run_performance_optimization
+    data:
+      strategy: "pattern"
+
+get_optimization_statistics:
+  name: Get optimization statistics
+  description: >-
+    Get statistics about the performance optimization system,
+    including optimization history, strategy success rates,
+    and learning progress.
+  example: |
+    # Get optimization statistics
+    service: modbus_local_gateway.get_optimization_statistics
+
+update_optimization_strategy:
+  name: Update optimization strategy
+  description: >-
+    Update parameters for a specific optimization strategy.
+    This allows fine-tuning how the optimization system works.
+  fields:
+    strategy:
+      name: Strategy
+      description: Which optimization strategy to update
+      required: true
+      selector:
+        select:
+          options:
+            - "interval"
+            - "cluster"
+            - "pattern"
+    parameters:
+      name: Parameters
+      description: Parameters to update (only specified parameters will be changed)
+      required: true
+      selector:
+        object:
+  example: |
+    # Make interval optimization more aggressive
+    service: modbus_local_gateway.update_optimization_strategy
+    data:
+      strategy: "interval"
+      parameters:
+        aggressiveness: 0.8
+        min_interval: 5
+        
+    # Adjust cluster correlation threshold
+    service: modbus_local_gateway.update_optimization_strategy
+    data:
+      strategy: "cluster"
+      parameters:
+        correlation_threshold: 0.7
+        min_cluster_size: 3
+
+# Adaptive parameter system services
+
+get_parameter_profiles:
+  name: Get parameter profiles
+  description: >-
+    Get parameter profiles for the adaptive parameter system.
+    If no profile name is specified, returns all profiles.
+  fields:
+    profile_name:
+      name: Profile name
+      description: Name of a specific profile to retrieve
+      required: false
+      selector:
+        text:
+  example: |
+    # Get all parameter profiles
+    service: modbus_local_gateway.get_parameter_profiles
+    
+    # Get a specific profile
+    service: modbus_local_gateway.get_parameter_profiles
+    data:
+      profile_name: night_mode
+
+create_parameter_profile:
+  name: Create parameter profile
+  description: >-
+    Create a new parameter profile for the adaptive parameter system.
+    The profile can contain custom parameters and context matching criteria.
+  fields:
+    name:
+      name: Profile name
+      description: Name for the new profile
+      required: true
+      selector:
+        text:
+    description:
+      name: Description
+      description: Description of the profile purpose
+      required: false
+      selector:
+        text:
+    parameters:
+      name: Parameters
+      description: Custom parameters for this profile
+      required: false
+      selector:
+        object:
+  example: |
+    # Create a basic profile
+    service: modbus_local_gateway.create_parameter_profile
+    data:
+      name: weekend_profile
+      description: Optimized settings for weekend operation
+      
+    # Create profile with custom parameters
+    service: modbus_local_gateway.create_parameter_profile
+    data:
+      name: low_power_mode
+      description: Conservative operation for energy saving
+      parameters:
+        min_scan_interval: 30
+        max_scan_interval: 1800
+        max_parallel_requests: 1
+        registers_per_second_limit: 40
+
+update_parameter_profile:
+  name: Update parameter profile
+  description: >-
+    Update an existing parameter profile with new settings.
+  fields:
+    name:
+      name: Profile name
+      description: Name of the profile to update
+      required: true
+      selector:
+        text:
+    description:
+      name: Description
+      description: New description for the profile
+      required: false
+      selector:
+        text:
+    parameters:
+      name: Parameters
+      description: Parameters to update (only specified parameters are changed)
+      required: false
+      selector:
+        object:
+    context_match:
+      name: Context matching
+      description: >-
+        Context matching criteria for automatic profile selection.
+        Advanced option - see documentation for format details.
+      required: false
+      selector:
+        object:
+  example: |
+    # Update profile description
+    service: modbus_local_gateway.update_parameter_profile
+    data:
+      name: night_mode
+      description: Updated settings for nighttime operation
+      
+    # Update specific parameters
+    service: modbus_local_gateway.update_parameter_profile
+    data:
+      name: night_mode
+      parameters:
+        min_scan_interval: 20
+        max_scan_interval: 1200
+
+delete_parameter_profile:
+  name: Delete parameter profile
+  description: >-
+    Delete a parameter profile. Note that you cannot delete the currently active profile.
+  fields:
+    name:
+      name: Profile name
+      description: Name of the profile to delete
+      required: true
+      selector:
+        text:
+  example: |
+    # Delete a profile
+    service: modbus_local_gateway.delete_parameter_profile
+    data:
+      name: low_power_mode
+
+activate_parameter_profile:
+  name: Activate parameter profile
+  description: >-
+    Activate a specific parameter profile, applying its settings to the system immediately.
+  fields:
+    name:
+      name: Profile name
+      description: Name of the profile to activate
+      required: true
+      selector:
+        text:
+  example: |
+    # Activate a profile
+    service: modbus_local_gateway.activate_parameter_profile
+    data:
+      name: night_mode
+
+adapt_parameters:
+  name: Adapt parameters
+  description: >-
+    Adapt parameters to current system context, using the profile that best matches current conditions.
+  fields:
+    force:
+      name: Force adaptation
+      description: >-
+        If true, forces adaptation even if it wouldn't normally occur
+        due to recent previous adaptation.
+      required: false
+      default: false
+      selector:
+        boolean:
+  example: |
+    # Adapt parameters to current context
+    service: modbus_local_gateway.adapt_parameters
+    
+    # Force adaptation
+    service: modbus_local_gateway.adapt_parameters
+    data:
+      force: true
+
+get_parameter_status:
+  name: Get parameter status
+  description: >-
+    Get status information about the adaptive parameter system,
+    including active profile, current parameters, and context information.
+  example: |
+    # Get parameter system status
+    service: modbus_local_gateway.get_parameter_status
+
+set_parameter:
+  name: Set parameter
+  description: >-
+    Set a specific parameter value directly. This will override the current profile's setting.
+  fields:
+    name:
+      name: Parameter name
+      description: >-
+        Name of the parameter to set.
+        Common parameters include min_scan_interval, max_scan_interval, 
+        correlation_threshold, pattern_detection_sensitivity, etc.
+      required: true
+      selector:
+        text:
+    value:
+      name: Parameter value
+      description: New value for the parameter
+      required: true
+      selector:
+        text:
+  example: |
+    # Set maximum scan interval
+    service: modbus_local_gateway.set_parameter
+    data:
+      name: max_scan_interval
+      value: 600
+      
+    # Set pattern detection sensitivity
+    service: modbus_local_gateway.set_parameter
+    data:
+      name: pattern_detection_sensitivity
+      value: 0.7
