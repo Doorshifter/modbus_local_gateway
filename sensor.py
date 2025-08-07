@@ -1,35 +1,21 @@
 """Sensor platform for Modbus Local Gateway."""
 
-from __future__ import annotations
-
-import asyncio
 import logging
 
-from typing import Set
+# Minimal top-level imports
+_LOGGER = logging.getLogger(__name__)
+DOMAIN = "modbus_local_gateway"
 
-from homeassistant.components.sensor import SensorEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from .context import ModbusContext
-from .coordinator import ModbusCoordinator
-from .entity_management.base import ModbusSensorEntityDescription
-from .entity_management.const import ControlType
-from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-from .helpers import async_setup_entities, get_gateway_key
-from .const import DOMAIN
-
-_LOGGER: logging.Logger = logging.getLogger(__name__)
-
-_DIAGNOSTIC_SETUP_COMPLETE: Set[str] = set()
-
-async def async_setup_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Set up Modbus sensors from device files."""
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the sensor platform."""
+    # Import modules only when needed
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant, callback
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    
+    from .entity_management.const import ControlType
+    from .helpers import async_setup_entities, get_gateway_key
+    
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -43,79 +29,91 @@ async def async_setup_entry(
     @callback
     def coordinator_ready_callback(event):
         """Handle coordinator ready event."""
-        _LOGGER.warning("DIAG DEBUG: coordinator_ready_callback fired for gateway_key=%s event.data=%s", gateway_key, event.data)
+        _LOGGER.debug("Coordinator ready event fired for gateway_key=%s event.data=%s", gateway_key, event.data)
         if event.data.get("gateway_key") == gateway_key:
-            if gateway_key in _DIAGNOSTIC_SETUP_COMPLETE:
-                _LOGGER.warning("DIAG DEBUG: Diagnostics already set up for gateway_key=%s, skipping.", gateway_key)
+            # Create a set here to track setup status
+            if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
+                hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
+                
+            if gateway_key in hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"]:
+                _LOGGER.debug("Diagnostics already set up for gateway_key=%s, skipping.", gateway_key)
                 return
+                
             hass.async_create_task(
                 _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key)
             )
 
     hass.bus.async_listen(f"{DOMAIN}_coordinator_ready", coordinator_ready_callback)
 
-    if gateway_key not in _DIAGNOSTIC_SETUP_COMPLETE:
+    # Create a set here to track setup status
+    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
+        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
+        
+    if gateway_key not in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
+        import asyncio
         hass.async_create_task(
             _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key)
         )
 
-async def _delayed_diagnostic_setup_check(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-    gateway_key: str,
-) -> None:
-    _LOGGER.warning("DIAG DEBUG: _delayed_diagnostic_setup_check running for gateway_key=%s", gateway_key)
+async def _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key):
+    """Delayed check for diagnostic sensor setup."""
+    import asyncio
+    
+    _LOGGER.debug("Delayed diagnostic setup check running for gateway_key=%s", gateway_key)
     await asyncio.sleep(3)
 
-    if gateway_key in _DIAGNOSTIC_SETUP_COMPLETE:
-        _LOGGER.warning("DIAG DEBUG: Diagnostics already set up in delayed check for gateway_key=%s, skipping.", gateway_key)
+    # Create a set here to track setup status if not exists
+    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
+        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
+
+    if gateway_key in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
+        _LOGGER.debug("Diagnostics already set up in delayed check for gateway_key=%s, skipping.", gateway_key)
         return
 
     if gateway_key in hass.data.get(DOMAIN, {}):
         coordinator = hass.data[DOMAIN][gateway_key]
         initialized = getattr(coordinator, '_initialized', False)
 
-        if initialized and gateway_key not in _DIAGNOSTIC_SETUP_COMPLETE:
+        if initialized and gateway_key not in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
             await _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key)
         elif not initialized:
-            _LOGGER.warning("DIAG DEBUG: Delayed check: Coordinator for %s NOT initialized", gateway_key)
+            _LOGGER.debug("Delayed check: Coordinator for %s NOT initialized", gateway_key)
     else:
-        _LOGGER.warning("DIAG DEBUG: Delayed check: Coordinator for %s not found in hass.data[DOMAIN]", gateway_key)
+        _LOGGER.debug("Delayed check: Coordinator for %s not found in hass.data[DOMAIN]", gateway_key)
 
-async def _setup_diagnostic_sensors(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-    gateway_key: str,
-) -> None:
-    _LOGGER.warning("DIAG DEBUG: _setup_diagnostic_sensors entered for gateway_key=%s", gateway_key)
-    if gateway_key in _DIAGNOSTIC_SETUP_COMPLETE:
-        _LOGGER.warning("DIAG DEBUG: Diagnostics already set up for gateway_key=%s, exiting.", gateway_key)
+async def _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key):
+    """Set up diagnostic sensors."""
+    _LOGGER.debug("Setting up diagnostic sensors for gateway_key=%s", gateway_key)
+    
+    # Create a set here to track setup status if not exists
+    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
+        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
+        
+    if gateway_key in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
+        _LOGGER.debug("Diagnostics already set up for gateway_key=%s, exiting.", gateway_key)
         return
 
     try:
+        # Import diagnostic sensor module when needed, not at module load time
         from .diagnostic_sensor import DIAGNOSTIC_SENSORS, ModbusDiagnosticSensor, build_device_info
     except ImportError as err:
-        _LOGGER.error("DIAG DEBUG: Diagnostic sensor module not available: %r", err)
-        if gateway_key in _DIAGNOSTIC_SETUP_COMPLETE:
-            _DIAGNOSTIC_SETUP_COMPLETE.remove(gateway_key)
+        _LOGGER.error("Diagnostic sensor module not available: %r", err)
         return
 
     try:
         if gateway_key not in hass.data.get(DOMAIN, {}):
-            _LOGGER.warning("DIAG DEBUG: Coordinator not found for diagnostic sensors: %s", gateway_key)
+            _LOGGER.warning("Coordinator not found for diagnostic sensors: %s", gateway_key)
             return
 
-        coordinator: ModbusCoordinator = hass.data[DOMAIN][gateway_key]
+        coordinator = hass.data[DOMAIN][gateway_key]
 
         if not getattr(coordinator, '_initialized', False):
-            _LOGGER.warning("DIAG DEBUG: Coordinator for %s is NOT initialized", gateway_key)
+            _LOGGER.warning("Coordinator for %s is NOT initialized", gateway_key)
             return
 
         device_info = getattr(coordinator, "device_info", None)
         if not device_info:
-            _LOGGER.warning("DIAG DEBUG: device_info missing for coordinator %s", gateway_key)
+            _LOGGER.warning("Device info missing for coordinator %s", gateway_key)
             return
 
         device_info_dict = build_device_info(device_info, config_entry)
@@ -130,37 +128,50 @@ async def _setup_diagnostic_sensors(
             for description in DIAGNOSTIC_SENSORS
         ]
 
-        _LOGGER.warning(
-            "About to add %d diagnostic sensor entities for gateway %s: %s",
+        _LOGGER.info(
+            "Adding %d diagnostic sensor entities for gateway %s: %s",
             len(entities_to_add), gateway_key, [e.entity_description.key for e in entities_to_add]
         )
         async_add_entities(entities_to_add, True)
-        _DIAGNOSTIC_SETUP_COMPLETE.add(gateway_key)
+        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"].add(gateway_key)
         _LOGGER.info(
             "Added %d diagnostic sensor entities for gateway %s",
             len(entities_to_add), gateway_key
         )
 
     except Exception as exc:
-        if gateway_key in _DIAGNOSTIC_SETUP_COMPLETE:
-            _DIAGNOSTIC_SETUP_COMPLETE.remove(gateway_key)
         _LOGGER.exception("Failed to set up diagnostic sensors: %s", exc)
 
-class ModbusSensorEntity(ModbusCoordinatorEntity, SensorEntity):
+class ModbusSensorEntity:
     """Sensor entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator: ModbusCoordinator,
-        modbus_context: ModbusContext,
+        coordinator,
+        modbus_context,
         device,
-    ) -> None:
+    ):
         """Initialize the Modbus sensor."""
-        super().__init__(
+        # Import needed modules inside the method
+        from homeassistant.components.sensor import SensorEntity
+        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+        from .entity_management.base import ModbusSensorEntityDescription
+        
+        # Multiple inheritance using class objects dynamically loaded
+        self.__class__ = type(
+            self.__class__.__name__,
+            (ModbusCoordinatorEntity, SensorEntity),
+            {}
+        )
+        
+        # Initialize parent classes using super()
+        ModbusCoordinatorEntity.__init__(
+            self,
             coordinator=coordinator,
             modbus_context=modbus_context,
             device_info=device
         )
+        
         if not isinstance(modbus_context.desc, ModbusSensorEntityDescription):
             raise TypeError(f"Invalid description type: {type(modbus_context.desc)}")
         

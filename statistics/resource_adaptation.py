@@ -1,249 +1,171 @@
 """
-Resource adaptation system for Modbus optimization.
+Resource adaptation system for Modbus Local Gateway.
 
-This module dynamically adjusts processing intensity based on available
-system resources to ensure reliable operation across different hardware.
+This module analyzes system resources and adapts polling behavior
+to optimize performance based on available CPU/memory.
 """
 
 import logging
-import time
-from datetime import datetime
-import threading
-from typing import Dict, Any, Tuple, Optional
+import sys
+import psutil
+from typing import Dict, Any, Optional
 
 _LOGGER = logging.getLogger(__name__)
 
-class ResourceAdaptiveScaling:
-    """Adapts processing based on available system resources."""
-    
-    _instance = None
-    
-    @classmethod
-    def get_instance(cls):
-        """Get singleton instance."""
-        if cls._instance is None:
-            cls._instance = ResourceAdaptiveScaling()
-        return cls._instance
-    
+class ResourceAdapter:
+    """Analyzes system resources and makes recommendations for optimal settings."""
+
     def __init__(self):
-        """Initialize resource adaptation system."""
-        self.parallelism = 1
-        self.batch_size = 50
-        self.analysis_depth = "standard"
-        self.last_measurement = 0
-        self.measurement_interval = 300  # 5 minutes
-        self.last_capabilities = None
-        self.resource_history = []
-        self.max_history = 24  # Keep 24 measurements
-        self.capability_lock = threading.Lock()
-        
-        # Try to import psutil, but don't fail if not available
+        """Initialize the resource adapter."""
+        self._system_capabilities = {}
+        self._recommendations = {
+            "polls_per_second": 10,  # Default conservative value
+            "concurrent_requests": 1,
+            "read_timeout": 10,
+            "write_timeout": 10,
+        }
+
+    def measure_system_capabilities_blocking(self):
+        """Measure system capabilities - BLOCKING VERSION for executor_job."""
+        # This is a blocking function and should only be called from executor_job
         try:
-            import psutil
-            self.psutil_available = True
-        except ImportError:
-            self.psutil_available = False
-            _LOGGER.info("psutil not available - resource adaptation will use limited capability estimation")
-    
-    def measure_system_capabilities(self) -> Dict[str, Any]:
-        """Measure current system capabilities."""
-        current_time = time.time()
-        
-        # Use cached measurements if recent enough
-        with self.capability_lock:
-            if (current_time - self.last_measurement < self.measurement_interval and 
-                self.last_capabilities is not None):
-                return self.last_capabilities.copy()
-        
-        try:
-            if self.psutil_available:
-                import psutil
-                
-                # Get CPU and memory metrics
-                cpu_count = psutil.cpu_count()
-                available_memory_mb = psutil.virtual_memory().available / (1024 * 1024)
-                cpu_usage_percent = psutil.cpu_percent(interval=0.5)
-                
-                # Calculate capacity score (0.0-1.0)
-                # Higher means more available capacity
-                cpu_capacity = 1.0 - (cpu_usage_percent / 100.0)
-                memory_capacity = min(1.0, available_memory_mb / 1000.0)  # Cap at 1.0
-                
-                # Combined capacity score (weighted)
-                capacity_score = (cpu_capacity * 0.7) + (memory_capacity * 0.3)
-                
-                capabilities = {
-                    "cpu_count": cpu_count,
-                    "cpu_usage_percent": round(cpu_usage_percent, 1),
-                    "available_memory_mb": round(available_memory_mb),
-                    "capacity_score": round(capacity_score, 2),
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-            else:
-                # Fall back to basic capability estimate
-                capabilities = self._estimate_capabilities()
-                
-            # Store measurement
-            with self.capability_lock:
-                self.last_measurement = current_time
-                self.last_capabilities = capabilities.copy()
-                
-                # Add to history
-                self.resource_history.append(capabilities)
-                
-                # Keep history bounded
-                while len(self.resource_history) > self.max_history:
-                    self.resource_history.pop(0)
+            # Get system information
+            memory = psutil.virtual_memory()
+            cpu_count = psutil.cpu_count(logical=True)
+            cpu_usage_percent = psutil.cpu_percent(interval=0.5)  # This was the blocking call at line 65
             
-            return capabilities
+            # Store results
+            self._system_capabilities = {
+                "memory_total": memory.total,
+                "memory_available": memory.available,
+                "cpu_count": cpu_count,
+                "cpu_usage": cpu_usage_percent,
+                "platform": sys.platform,
+                "python_version": sys.version,
+            }
+            
+            # Calculate recommendations based on system capabilities
+            self._calculate_recommendations()
+            
+            return self._system_capabilities
+        except Exception as e:
+            _LOGGER.error("Error measuring system capabilities: %s", e)
+            return {}
+
+    def measure_system_capabilities(self):
+        """Non-blocking wrapper that returns cached capabilities.
+        
+        For actual measurement, use async_measure_system_capabilities.
+        """
+        # Just return whatever we have (might be empty on first call)
+        return self._system_capabilities
+
+    async def async_measure_system_capabilities(self, hass):
+        """Async wrapper for measuring system capabilities."""
+        return await hass.async_add_executor_job(self.measure_system_capabilities_blocking)
+
+    def _calculate_recommendations(self):
+        """Calculate recommendations based on system capabilities."""
+        try:
+            # Only calculate if we have valid system data
+            if not self._system_capabilities:
+                return
+                
+            # Get system values
+            memory_available_gb = self._system_capabilities.get("memory_available", 0) / (1024 * 1024 * 1024)
+            cpu_count = self._system_capabilities.get("cpu_count", 1)
+            cpu_usage = self._system_capabilities.get("cpu_usage", 50)
+            
+            # Calculate polls per second based on system resources
+            # More conservative if CPU usage is high or memory is low
+            if cpu_usage > 80:
+                polls_per_second = max(5, min(10, cpu_count * 2))
+            elif cpu_usage > 50:
+                polls_per_second = max(10, min(20, cpu_count * 3))
+            else:
+                polls_per_second = max(15, min(30, cpu_count * 4))
+                
+            # Adjust for available memory
+            if memory_available_gb < 0.5:
+                polls_per_second = max(5, polls_per_second // 2)
+            elif memory_available_gb > 2:
+                polls_per_second = min(50, polls_per_second * 1.5)
+                
+            # Set concurrent requests based on CPU count and usage
+            concurrent_requests = max(1, min(4, cpu_count // 2))
+            if cpu_usage > 70:
+                concurrent_requests = 1
+                
+            # Update recommendations
+            self._recommendations = {
+                "polls_per_second": int(polls_per_second),
+                "concurrent_requests": concurrent_requests,
+                "read_timeout": 10 if cpu_usage < 70 else 15,
+                "write_timeout": 10 if cpu_usage < 70 else 15,
+            }
+            
+            _LOGGER.debug("Resource recommendations calculated: %s", self._recommendations)
+        except Exception as e:
+            _LOGGER.error("Error calculating resource recommendations: %s", e)
+
+    def get_throughput_recommendation(self) -> Dict[str, Any]:
+        """Get recommended throughput settings based on system capabilities."""
+        return self._recommendations
+
+    def get_system_info(self) -> Dict[str, Any]:
+        """Get system information for diagnostics."""
+        return self._system_capabilities
+    
+    def analyze_performance_trend(self, recent_performances: list) -> Dict[str, Any]:
+        """Analyze recent performance measurements and adjust recommendations."""
+        if not recent_performances or len(recent_performances) < 5:
+            return self._recommendations
+            
+        try:
+            # Calculate average response times
+            avg_response_time = sum(perf.get('response_time', 0) for perf in recent_performances) / len(recent_performances)
+            
+            # Calculate error rates
+            total_requests = sum(perf.get('total_requests', 0) for perf in recent_performances)
+            total_errors = sum(perf.get('errors', 0) for perf in recent_performances)
+            error_rate = (total_errors / total_requests) if total_requests > 0 else 0
+            
+            # Adjust recommendations based on performance metrics
+            new_recommendations = dict(self._recommendations)
+            
+            # Adjust polls per second based on response time and error rate
+            if avg_response_time > 1.0 or error_rate > 0.05:
+                new_recommendations["polls_per_second"] = max(5, int(new_recommendations["polls_per_second"] * 0.8))
+            elif avg_response_time < 0.2 and error_rate < 0.01:
+                new_recommendations["polls_per_second"] = min(50, int(new_recommendations["polls_per_second"] * 1.2))
+                
+            # Adjust timeouts based on response times
+            if avg_response_time > 5.0:
+                new_recommendations["read_timeout"] = max(15, new_recommendations["read_timeout"] + 5)
+                new_recommendations["write_timeout"] = max(15, new_recommendations["write_timeout"] + 5)
+            
+            _LOGGER.debug("Performance-based recommendations: %s", new_recommendations)
+            return new_recommendations
             
         except Exception as e:
-            _LOGGER.exception("Error measuring system capabilities: %s", e)
-            return self._estimate_capabilities()
-    
-    def _estimate_capabilities(self) -> Dict[str, Any]:
-        """Estimate system capabilities when psutil is not available."""
-        import os
-        import sys
-        
-        # Make conservative estimates
-        try:
-            # Try to get CPU count through os
-            cpu_count = os.cpu_count() or 1
-        except Exception:
-            cpu_count = 1
+            _LOGGER.error("Error analyzing performance trend: %s", e)
+            return self._recommendations
+
+    def get_memory_recommendation(self) -> Dict[str, Any]:
+        """Get memory-specific optimization recommendations."""
+        if not self._system_capabilities:
+            return {"reduce_poll_rate": False, "reduce_entities": False}
             
-        # Assume moderate capacity
-        capacity_score = 0.5
+        memory_available_gb = self._system_capabilities.get("memory_available", 4) / (1024 * 1024 * 1024)
+        memory_total_gb = self._system_capabilities.get("memory_total", 8) / (1024 * 1024 * 1024)
+        memory_percent_used = 100 - (memory_available_gb / memory_total_gb * 100) if memory_total_gb > 0 else 50
         
         return {
-            "cpu_count": cpu_count,
-            "cpu_usage_percent": None,
-            "available_memory_mb": None,
-            "capacity_score": capacity_score,
-            "estimated": True,
-            "timestamp": datetime.utcnow().isoformat()
-        }
-    
-    def adapt_processing_intensity(self) -> Tuple[int, int, str]:
-        """Adapt processing intensity based on system capabilities."""
-        capabilities = self.measure_system_capabilities()
-        capacity_score = capabilities["capacity_score"]
-        
-        # Adjust processing parameters based on capacity
-        if capacity_score > 0.7:
-            # High capacity - use full capabilities
-            self.parallelism = max(1, capabilities.get("cpu_count", 1) - 1)
-            self.batch_size = 100
-            self.analysis_depth = "full"
-        elif capacity_score > 0.4:
-            # Medium capacity - moderate resource usage
-            self.parallelism = max(1, (capabilities.get("cpu_count", 1) // 2))
-            self.batch_size = 50
-            self.analysis_depth = "standard"
-        else:
-            # Low capacity - conservative resource usage
-            self.parallelism = 1
-            self.batch_size = 25
-            self.analysis_depth = "basic"
-            
-        # Log adaptation
-        _LOGGER.debug(
-            "Adapted processing: capacity=%.2f, parallelism=%d, batch_size=%d, depth=%s",
-            capacity_score, self.parallelism, self.batch_size, self.analysis_depth
-        )
-        
-        return self.parallelism, self.batch_size, self.analysis_depth
-    
-    def get_resource_history(self) -> Dict[str, Any]:
-        """Get resource usage history."""
-        with self.capability_lock:
-            history = self.resource_history.copy()
-            
-        # Calculate trend if we have enough history
-        trend = None
-        if len(history) >= 2:
-            first = history[0]["capacity_score"]
-            last = history[-1]["capacity_score"]
-            trend = round(last - first, 2)
-        
-        # Get min/max/avg
-        if history:
-            capacity_scores = [entry["capacity_score"] for entry in history]
-            capacity_min = min(capacity_scores)
-            capacity_max = max(capacity_scores)
-            capacity_avg = sum(capacity_scores) / len(capacity_scores)
-        else:
-            capacity_min = capacity_max = capacity_avg = 0
-        
-        return {
-            "current": self.last_capabilities,
-            "history_points": len(history),
-            "capacity_trend": trend,
-            "capacity_min": round(capacity_min, 2),
-            "capacity_max": round(capacity_max, 2),
-            "capacity_avg": round(capacity_avg, 2),
-            "adaptation": {
-                "parallelism": self.parallelism,
-                "batch_size": self.batch_size,
-                "analysis_depth": self.analysis_depth
-            }
-        }
-    
-    def get_throughput_recommendation(self) -> Dict[str, Any]:
-        """Get recommended throughput parameters."""
-        capabilities = self.measure_system_capabilities()
-        capacity = capabilities["capacity_score"]
-        
-        # Calculate recommended polling throughput based on your existing batch management
-        if capabilities.get("cpu_count"):
-            base_throughput = capabilities["cpu_count"] * 5  # Base throughput per CPU core
-        else:
-            base_throughput = 10  # Conservative default
-        
-        # Adjust by capacity
-        throughput = base_throughput * capacity
-        
-        # Safety factor (80% of theoretical maximum)
-        safe_throughput = throughput * 0.8
-        
-        return {
-            "polls_per_second": round(safe_throughput, 1),
-            "capacity_score": capacity,
-            "estimated_entity_capacity": {
-                "1s_interval": int(safe_throughput),
-                "5s_interval": int(safe_throughput * 5),
-                "30s_interval": int(safe_throughput * 30),
-                "60s_interval": int(safe_throughput * 60)
-            }
+            "reduce_poll_rate": memory_percent_used > 80 or memory_available_gb < 0.5,
+            "reduce_entities": memory_percent_used > 90 or memory_available_gb < 0.25,
+            "memory_pressure": memory_percent_used,
+            "recommended_max_entities": max(50, int(memory_available_gb * 200)),
         }
 
-    def should_run_expensive_operation(self, operation_name: str) -> bool:
-        """Determine if an expensive operation should run based on current resources."""
-        capabilities = self.measure_system_capabilities()
-        capacity = capabilities["capacity_score"]
-        
-        # Define capacity thresholds based on operation
-        if operation_name == "correlation_analysis":
-            required_capacity = 0.4
-        elif operation_name == "pattern_detection":
-            required_capacity = 0.3
-        elif operation_name == "prediction_training":
-            required_capacity = 0.5
-        else:
-            # Default for unknown operations
-            required_capacity = 0.4
-            
-        should_run = capacity >= required_capacity
-        
-        if not should_run:
-            _LOGGER.info(
-                "Deferring %s operation due to insufficient capacity (%.2f < %.2f required)",
-                operation_name, capacity, required_capacity
-            )
-            
-        return should_run
-
-
-# Global instance
-RESOURCE_ADAPTER = ResourceAdaptiveScaling.get_instance()
+# Global singleton instance
+RESOURCE_ADAPTER = ResourceAdapter()

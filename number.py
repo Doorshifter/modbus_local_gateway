@@ -1,31 +1,23 @@
 """Modbus Local Gateway Number Entity"""
 
-from __future__ import annotations
-
-import asyncio
 import logging
 
-from typing import Any
+# Minimal top-level imports
+_LOGGER = logging.getLogger(__name__)
+DOMAIN = "modbus_local_gateway"
 
-from homeassistant.components.number import NumberEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from .context import ModbusContext
-from .coordinator import ModbusCoordinator
-from .entity_management.base import ModbusNumberEntityDescription
-from .entity_management.const import ControlType, ModbusDataType
-from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-from .helpers import async_setup_entities
-
-_LOGGER: logging.Logger = logging.getLogger(__name__)
-
-async def async_setup_entry(
-    hass,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Set up Modbus number entities for the config entry."""
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the number platform."""
+    # Import modules only when needed
+    from homeassistant.components.number import NumberEntity
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    
+    from .context import ModbusContext
+    from .entity_management.const import ControlType
+    from .helpers import async_setup_entities
+    
+    # Set up entities
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -34,21 +26,38 @@ async def async_setup_entry(
         entity_class=ModbusNumberEntity,
     )
 
-class ModbusNumberEntity(ModbusCoordinatorEntity, NumberEntity):
+class ModbusNumberEntity:
     """Number entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator: ModbusCoordinator,
-        modbus_context: ModbusContext,
+        coordinator,
+        modbus_context,
         device,
-    ) -> None:
+    ):
         """Initialize the Modbus number entity."""
-        super().__init__(
+        # Import needed modules inside the method
+        import asyncio
+        from homeassistant.components.number import NumberEntity
+        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+        from .entity_management.base import ModbusNumberEntityDescription
+        from .entity_management.const import ModbusDataType
+        
+        # Multiple inheritance using class objects dynamically loaded
+        self.__class__ = type(
+            self.__class__.__name__,
+            (ModbusCoordinatorEntity, NumberEntity),
+            {}
+        )
+        
+        # Initialize parent classes using super()
+        ModbusCoordinatorEntity.__init__(
+            self,
             coordinator=coordinator,
             modbus_context=modbus_context,
             device_info=device
         )
+        
         if not isinstance(modbus_context.desc, ModbusNumberEntityDescription):
             raise TypeError("Invalid description type")
         
@@ -68,7 +77,7 @@ class ModbusNumberEntity(ModbusCoordinatorEntity, NumberEntity):
             key = getattr(self._attr_entity_description, "key", None)
         return self.coordinator.data.get(key) if key else None
 
-    def _generate_extra_attributes(self) -> dict:
+    def _generate_extra_attributes(self):
         """Add number-specific attributes."""
         attrs = super()._generate_extra_attributes()
         
@@ -84,13 +93,17 @@ class ModbusNumberEntity(ModbusCoordinatorEntity, NumberEntity):
         
         return attrs
 
-    def set_native_value(self, value: float) -> None:
+    def set_native_value(self, value):
         """Set the value of the Modbus number entity (sync wrapper)."""
+        import asyncio
         future = asyncio.run_coroutine_threadsafe(self.async_set_native_value(value), self.hass.loop)
         future.result()
 
-    async def async_set_native_value(self, value: float) -> None:
+    async def async_set_native_value(self, value):
         """Set the value of the Modbus number entity (async)."""
+        # Import needed modules inside the method
+        from .entity_management.const import ModbusDataType
+        
         # Safe access to entity description
         if hasattr(self, "entity_description"):
             desc = self.entity_description

@@ -4,23 +4,18 @@ from __future__ import annotations
 import logging
 import sys
 import platform
+import functools
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+# Safe top-level imports
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_HOST, 
-    CONF_PORT,
-    __version__ as HA_VERSION,
-)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.const import CONF_HOST, CONF_PORT, __version__ as HA_VERSION
 
 from .const import DOMAIN, CONF_SLAVE_ID
-from .coordinator import ModbusCoordinator
-from .helpers import get_gateway_key
-from .tcp_client import AsyncModbusTcpClientGateway
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -72,6 +67,9 @@ async def async_get_config_entry_diagnostics(
     Returns:
         A dictionary containing diagnostics information.
     """
+    # Lazy import helpers to avoid circular imports
+    from .helpers import get_gateway_key
+    
     diagnostics_data = {}
     
     try:
@@ -105,6 +103,10 @@ async def async_get_config_entry_diagnostics(
             })
             return _make_json_serializable(diagnostics_data)
         
+        # Import needed classes only when needed
+        from .coordinator import ModbusCoordinator
+        from .tcp_client import AsyncModbusTcpClientGateway
+        
         coordinator: ModbusCoordinator = domain_data[gateway_key]
         client = _safe_get_attr(coordinator, "client", None)
         
@@ -130,6 +132,8 @@ async def async_get_config_entry_diagnostics(
     except Exception as ex:
         _LOGGER.exception("Critical error in diagnostics collection: %s", ex)
         diagnostics_data["critical_error"] = f"Failed to collect diagnostics: {ex}"
+        
+    # Try to write diagnostics file
     try:
         import json
         from pathlib import Path
@@ -147,12 +151,13 @@ async def async_get_config_entry_diagnostics(
             with open(path, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2)
         
-        await hass.async_add_executor_job(functools.partial(_write_diagnostics_file, diagnostics_file, data))
+        await hass.async_add_executor_job(_write_diagnostics_file, diagnostics_file, final_data)
         
         _LOGGER.info("Modbus diagnostics written to: %s", diagnostics_file)
         
     except Exception as ex:
         _LOGGER.error("Failed to write modbus diagnostics file: %s", ex)
+        
     return _make_json_serializable(diagnostics_data)
 
 
@@ -178,7 +183,7 @@ def _get_system_info() -> Dict[str, Any]:
 
 
 def _get_connection_info(
-    client: Optional[AsyncModbusTcpClientGateway], 
+    client: Optional[Any], 
     entry: ConfigEntry
 ) -> Dict[str, Any]:
     """Get connection information with better error handling."""
@@ -214,7 +219,7 @@ def _get_connection_info(
         }
 
 
-def _get_adaptive_timeout_info(client: Optional[AsyncModbusTcpClientGateway]) -> Dict[str, Any]:
+def _get_adaptive_timeout_info(client: Optional[Any]) -> Dict[str, Any]:
     """
     Get adaptive timeout statistics from the client.
     
@@ -240,7 +245,7 @@ def _get_adaptive_timeout_info(client: Optional[AsyncModbusTcpClientGateway]) ->
         return {"error": f"Failed to get adaptive timeout info: {ex}"}
 
 
-def _get_coordinator_info(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_coordinator_info(coordinator: Any) -> Dict[str, Any]:
     """
     Get coordinator state information.
     
@@ -272,7 +277,7 @@ def _get_coordinator_info(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to get coordinator info: {ex}"}
 
 
-def _get_throughput_limiter_info(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_throughput_limiter_info(coordinator: Any) -> Dict[str, Any]:
     """
     Get throughput limiter (batch manager) information.
     
@@ -286,7 +291,7 @@ def _get_throughput_limiter_info(coordinator: ModbusCoordinator) -> Dict[str, An
         batch_managers = _safe_get_attr(coordinator, "_batch_managers", {})
         initialized = _safe_get_attr(coordinator, "_initialized", False)
         
-        # ✅ NEW: Handle uninitialized state
+        # Handle uninitialized state
         if not initialized:
             return {
                 "status": "Coordinator initializing - batch managers will be created after first data update",
@@ -417,7 +422,7 @@ async def _get_entity_registry_info(
         return {"error": f"Failed to get entity registry info: {ex}"}
 
 
-def _get_data_info(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_data_info(coordinator: Any) -> Dict[str, Any]:
     """
     Get metadata about the data stored in the coordinator.
     
@@ -456,7 +461,7 @@ def _get_data_info(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to get data info: {ex}"}
 
 
-def _get_entity_analysis(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_entity_analysis(coordinator: Any) -> Dict[str, Any]:
     """Analyze entity distribution and characteristics."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])
@@ -501,7 +506,7 @@ def _get_entity_analysis(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to analyze entities: {ex}"}
 
 
-def _get_batch_efficiency_analysis(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_batch_efficiency_analysis(coordinator: Any) -> Dict[str, Any]:
     """Analyze batch efficiency and optimization opportunities."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])
@@ -511,7 +516,7 @@ def _get_batch_efficiency_analysis(coordinator: ModbusCoordinator) -> Dict[str, 
         if not entities:
             return {"error": "No entities available for batch analysis"}
         
-        # ✅ NEW: Handle uninitialized coordinator
+        # Handle uninitialized coordinator
         if not initialized:
             return {
                 "status": "initializing",
@@ -610,7 +615,7 @@ def _calculate_efficiency_rating(entities_per_batch: float, register_efficiency:
         return "Unknown"
 
 
-def _get_health_assessment(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_health_assessment(coordinator: Any) -> Dict[str, Any]:
     """Calculate overall health score and status."""
     try:
         health_factors = {}
@@ -650,7 +655,7 @@ def _get_health_assessment(coordinator: ModbusCoordinator) -> Dict[str, Any]:
             health_factors["entities"] = "No entities configured"
         score_components["entities"] = entity_score
         
-        # ✅ NEW: Handle initialization status in batch efficiency (25 points max)
+        # Handle initialization status in batch efficiency (25 points max)
         if not initialized:
             batch_score = 0
             health_factors["batching"] = "Coordinator initializing - batch managers pending"
@@ -673,7 +678,7 @@ def _get_health_assessment(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         # Calculate total score
         total_score = sum(score_components.values())
         
-        # ✅ NEW: Adjust status based on initialization
+        # Adjust status based on initialization
         if not initialized:
             status = "Initializing"
             status_emoji = "🟡"
@@ -704,7 +709,7 @@ def _get_health_assessment(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to assess health: {ex}"}
 
 
-def _get_configuration_analysis(coordinator: ModbusCoordinator, entry: ConfigEntry) -> Dict[str, Any]:
+def _get_configuration_analysis(coordinator: Any, entry: ConfigEntry) -> Dict[str, Any]:
     """Analyze configuration for potential issues."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])
@@ -779,7 +784,7 @@ def _get_configuration_analysis(coordinator: ModbusCoordinator, entry: ConfigEnt
         return {"error": f"Failed to analyze configuration: {ex}"}
 
 
-def _get_register_mapping(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_register_mapping(coordinator: Any) -> Dict[str, Any]:
     """Create a map of register usage."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])
@@ -859,7 +864,7 @@ def _get_register_mapping(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to create register mapping: {ex}"}
 
 
-def _get_recommendations(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_recommendations(coordinator: Any) -> Dict[str, Any]:
     """Generate actionable recommendations."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])
@@ -874,7 +879,7 @@ def _get_recommendations(coordinator: ModbusCoordinator) -> Dict[str, Any]:
             "optimization": []
         }
         
-        # ✅ NEW: Handle initialization status
+        # Handle initialization status
         if not initialized:
             recommendations["low_priority"].append({
                 "category": "Status",
@@ -957,7 +962,7 @@ def _get_recommendations(coordinator: ModbusCoordinator) -> Dict[str, Any]:
         return {"error": f"Failed to generate recommendations: {ex}"}
 
 
-def _get_troubleshooting_guide(coordinator: ModbusCoordinator) -> Dict[str, Any]:
+def _get_troubleshooting_guide(coordinator: Any) -> Dict[str, Any]:
     """Provide troubleshooting guidance."""
     try:
         entities = _safe_get_attr(coordinator, "entities", [])

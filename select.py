@@ -1,31 +1,22 @@
 """Modbus Local Gateway Select Entity"""
 
-from __future__ import annotations
-
-import asyncio
 import logging
 
-from typing import Any
+# Minimal top-level imports
+_LOGGER = logging.getLogger(__name__)
+DOMAIN = "modbus_local_gateway"
 
-from homeassistant.components.select import SelectEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
-from .context import ModbusContext
-from .coordinator import ModbusCoordinator
-from .entity_management.base import ModbusSelectEntityDescription
-from .entity_management.const import ControlType, ModbusDataType
-from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-from .helpers import async_setup_entities
-
-_LOGGER: logging.Logger = logging.getLogger(__name__)
-
-async def async_setup_entry(
-    hass,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Set up Modbus select entities for the config entry."""
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the select platform."""
+    # Import modules only when needed
+    from homeassistant.components.select import SelectEntity
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    
+    from .entity_management.const import ControlType
+    from .helpers import async_setup_entities
+    
+    # Set up entities
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -34,21 +25,37 @@ async def async_setup_entry(
         entity_class=ModbusSelectEntity,
     )
 
-class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
+class ModbusSelectEntity:
     """Select entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator: ModbusCoordinator,
-        modbus_context: ModbusContext,
+        coordinator,
+        modbus_context,
         device,
-    ) -> None:
+    ):
         """Initialize the Modbus select entity."""
-        super().__init__(
+        # Import needed modules inside the method
+        import asyncio
+        from homeassistant.components.select import SelectEntity
+        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+        from .entity_management.base import ModbusSelectEntityDescription
+        
+        # Multiple inheritance using class objects dynamically loaded
+        self.__class__ = type(
+            self.__class__.__name__,
+            (ModbusCoordinatorEntity, SelectEntity),
+            {}
+        )
+        
+        # Initialize parent classes using super()
+        ModbusCoordinatorEntity.__init__(
+            self,
             coordinator=coordinator,
             modbus_context=modbus_context,
             device_info=device
         )
+        
         desc = modbus_context.desc
         if not isinstance(desc, ModbusSelectEntityDescription) or not desc.select_options:
             raise TypeError("Invalid description type or missing select options")
@@ -57,7 +64,7 @@ class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
         self._attr_entity_description = desc
         self.entity_description = desc
         
-        self._attr_options: list[str] = list(desc.select_options.values())
+        self._attr_options = list(desc.select_options.values())
 
     def _get_current_value(self):
         """Get current selected option."""
@@ -72,7 +79,7 @@ class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
         return self.coordinator.data.get(key) if key else None
 
     @property
-    def current_option(self) -> str | None:
+    def current_option(self):
         """Return the currently selected option."""
         value = self.native_value
         if value is None:
@@ -87,7 +94,7 @@ class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
         
         return select_options.get(int(value)) if select_options else None
 
-    def _generate_extra_attributes(self) -> dict:
+    def _generate_extra_attributes(self):
         """Add select-specific attributes."""
         attrs = super()._generate_extra_attributes()
         
@@ -101,13 +108,17 @@ class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
         
         return attrs
 
-    def select_option(self, option: str) -> None:
+    def select_option(self, option):
         """Synchronously select an option."""
+        import asyncio
         future = asyncio.run_coroutine_threadsafe(self.async_select_option(option), self.hass.loop)
         future.result()
 
-    async def async_select_option(self, option: str) -> None:
+    async def async_select_option(self, option):
         """Asynchronously change the selected option."""
+        # Import needed modules inside the method
+        from .entity_management.const import ModbusDataType
+        
         # Safe access to entity description
         if hasattr(self, "entity_description"):
             desc = self.entity_description
@@ -125,7 +136,7 @@ class ModbusSelectEntity(ModbusCoordinatorEntity, SelectEntity):
         if option not in value_values:
             raise ValueError(f"Invalid option: {option}")
 
-        value_to_write: int = value_keys[value_values.index(option)]
+        value_to_write = value_keys[value_values.index(option)]
 
         _LOGGER.debug(
             "Setting select entity %s to '%s' (value: %s, address: %s)",

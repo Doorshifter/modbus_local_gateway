@@ -1,51 +1,97 @@
 """
-Modbus Local Gateway Integration - Robust Initialization & Synchronization
+Modbus Local Gateway Integration - Lightweight initialization module.
 
-Ensures that device info and the ModbusCoordinator are fully set up and available
-before any platform or diagnostic entity is initialized. Diagnostics are only
-set up after a 'coordinator_ready' event is fired.
+This module is designed to minimize blocking operations during import.
+Heavy initialization is deferred until setup.
 """
 
-import os
 import logging
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_FILENAME
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
-from pathlib import Path
+import importlib
 
-from .const import (
-    DOMAIN,
-    PLATFORMS,
-    CONF_SLAVE_ID,
-    DEFAULT_SCAN_INTERVAL,
-    CONF_SCAN_INTERVAL,
-)
-from .coordinator import ModbusCoordinator
-from .entity_management.device_loader import create_device_info
-from .tcp_client import AsyncModbusTcpClientGateway
-from .statistics.self_healing import SELF_HEALING_SYSTEM
-from .statistics.resource_adaptation import RESOURCE_ADAPTER
-from .statistics import STATISTICS_MANAGER  # This is fine as it's defined in statistics/__init__.py
-from .services import async_setup_services
+# Define constants at module level for quick access
+DOMAIN = "modbus_local_gateway"
+PLATFORMS = ["sensor", "switch", "binary_sensor", "number", "select"]
 
-_LOGGER: logging.Logger = logging.getLogger(__name__)
+_LOGGER = logging.getLogger(__name__)
 
-def get_gateway_key(entry: ConfigEntry, with_slave: bool = True) -> str:
-    """Generate consistent gateway key for coordinator lookup."""
-    try:
-        if with_slave:
-            return f"{entry.data[CONF_HOST]}:{entry.data[CONF_PORT]}:{entry.data[CONF_SLAVE_ID]}"
-        return f"{entry.data[CONF_HOST]}:{entry.data[CONF_PORT]}"
-    except KeyError as e:
-        _LOGGER.error("Missing required config entry data: %s", e)
-        raise ConfigEntryNotReady(f"Missing configuration: {e}") from e
+async def _async_import_platforms(hass, platforms):
+    """Import platform modules in executor to avoid blocking."""
+    for platform in platforms:
+        module_path = f"custom_components.{DOMAIN}.{platform}"
+        try:
+            await hass.async_add_executor_job(importlib.import_module, module_path)
+            _LOGGER.debug(f"Pre-loaded platform module: {platform}")
+        except Exception as e:
+            _LOGGER.error(f"Error pre-loading platform {platform}: {e}")
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up the Modbus Local Gateway integration from a config entry."""
+async def async_setup_entry(hass, entry):
+    """Set up from a config entry."""
+    # Import all modules inside the function
+    from pathlib import Path
+    from homeassistant.const import CONF_HOST, CONF_PORT, CONF_FILENAME
+    from homeassistant.exceptions import ConfigEntryNotReady
+    
+    from .const import CONF_SLAVE_ID, DEFAULT_SCAN_INTERVAL, CONF_SCAN_INTERVAL
+    
+    # Helper function defined inside to avoid top-level imports
+    def get_gateway_key(entry_data, with_slave=True):
+        """Generate consistent gateway key for coordinator lookup."""
+        try:
+            if with_slave:
+                return f"{entry_data[CONF_HOST]}:{entry_data[CONF_PORT]}:{entry_data[CONF_SLAVE_ID]}"
+            return f"{entry_data[CONF_HOST]}:{entry_data[CONF_PORT]}"
+        except KeyError as e:
+            _LOGGER.error(f"Missing required config entry data: {e}")
+            raise ConfigEntryNotReady(f"Missing configuration: {e}") from e
+
+    # Initialize data structure
     hass.data.setdefault(DOMAIN, {})
+    
+    # Get gateway key early to minimize duplicated code
+    try:
+        gateway_key = get_gateway_key(entry.data)
+    except Exception as e:
+        _LOGGER.exception(f"Error generating gateway key: {e}")
+        raise ConfigEntryNotReady(f"Invalid configuration: {e}") from e
 
-    # STEP 1: Load device info from YAML (blocking)
+    # STEP 1: Initialize storage first
+    try:
+        from .statistics.persistent_statistics import PERSISTENT_STATISTICS_MANAGER
+        
+        config_dir = hass.config.path()
+        storage_path = Path(config_dir) / "modbus_statistics"
+        
+        # Initialize persistent statistics first
+        await hass.async_add_executor_job(PERSISTENT_STATISTICS_MANAGER.initialize, storage_path)
+        _LOGGER.info(f"Persistent statistics initialized with storage path: {storage_path}")
+        
+        # Now that storage is initialized, we can initialize other components
+        from .statistics.validation import ValidationManager
+        validation_manager = ValidationManager.get_instance()
+        validation_manager.set_hass(hass)
+        await hass.async_add_executor_job(validation_manager._initialize_storage_if_needed)
+        
+        # Initialize parameter manager
+        from .statistics.adaptive_parameters import PARAMETER_MANAGER
+        await hass.async_add_executor_job(PARAMETER_MANAGER.initialize_storage, storage_path)
+        
+        # Initialize self-healing system
+        from .statistics.self_healing import SELF_HEALING_SYSTEM
+        await hass.async_add_executor_job(SELF_HEALING_SYSTEM.initialize, storage_path)
+        
+        # Now initialize the statistics manager
+        from .statistics.manager import STATISTICS_MANAGER
+        STATISTICS_MANAGER.hass = hass  # Ensure hass is set
+        await hass.async_add_executor_job(STATISTICS_MANAGER.ensure_initialized)
+        
+    except Exception as e:
+        _LOGGER.warning(f"Failed to initialize statistics system: {e}")
+        # Non-critical error, continue setup
+
+    # STEP 2: Load device info
+    from .entity_management.device_loader import create_device_info
+    import os
+    
     try:
         device_info = await hass.async_add_executor_job(
             create_device_info, hass, entry.data[CONF_FILENAME]
@@ -54,42 +100,32 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             raise ConfigEntryNotReady("Device info YAML loaded but returned empty")
     except FileNotFoundError as e:
         _LOGGER.error(
-            "Failed to load device info YAML from %s (cwd: %s): %s",
-            entry.data[CONF_FILENAME],
-            os.getcwd(),
-            e
+            f"Failed to load device info YAML from {entry.data[CONF_FILENAME]} (cwd: {os.getcwd()}): {e}"
         )
         raise ConfigEntryNotReady(f"Device YAML not found: {e}") from e
     except Exception as e:
-        _LOGGER.exception("Unexpected error loading device info YAML: %s", e)
+        _LOGGER.exception(f"Unexpected error loading device info YAML: {e}")
         raise ConfigEntryNotReady(f"Error loading device info: {e}") from e
 
-    # STEP 1.5: Initialize self-healing and resource adaptation systems
-    config_dir = hass.config.path()
-    storage_path = Path(config_dir) / "modbus_statistics"
+    # STEP 3: Measure system capabilities
     try:
-        SELF_HEALING_SYSTEM.initialize(storage_path)
-        _LOGGER.info("Self-healing system initialized with storage path: %s", storage_path)
+        from .statistics.resource_adaptation import RESOURCE_ADAPTER
         
-        # Run initial health check in the background
-        hass.async_create_task(
-            hass.async_add_executor_job(SELF_HEALING_SYSTEM.check_and_heal_system, False)
-        )
+        # Measure system capabilities using async method
+        await RESOURCE_ADAPTER.async_measure_system_capabilities(hass)
+        capabilities = await hass.async_add_executor_job(RESOURCE_ADAPTER.get_capabilities)
+        throughput = await hass.async_add_executor_job(RESOURCE_ADAPTER.get_throughput_recommendation)
+        max_registers_per_second = throughput.get("polls_per_second", None)
         
-        # Measure system capabilities
-        hass.async_create_task(
-            hass.async_add_executor_job(RESOURCE_ADAPTER.measure_system_capabilities)
-        )
+        _LOGGER.info("System capabilities measured: %s", capabilities)
     except Exception as e:
-        _LOGGER.warning("Failed to initialize self-healing system: %s", e)
+        _LOGGER.warning("Failed to measure system capabilities: %s", e)
+        max_registers_per_second = None
         # Non-critical error, continue setup
 
-    # STEP 2: Create or get the Modbus TCP client instance
+    # STEP 4: Create or get the Modbus TCP client instance
     try:
-        # Apply resource adaptation recommendations if available
-        capabilities = RESOURCE_ADAPTER.measure_system_capabilities()
-        throughput = RESOURCE_ADAPTER.get_throughput_recommendation()
-        max_registers_per_second = throughput.get("polls_per_second", None)
+        from .tcp_client import AsyncModbusTcpClientGateway
         
         client = AsyncModbusTcpClientGateway.async_get_client_connection(
             host=entry.data[CONF_HOST],
@@ -102,9 +138,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.exception("Error creating Modbus client: %s", e)
         raise ConfigEntryNotReady(f"Modbus client setup failed: {e}") from e
 
-    # STEP 3: Create and store ModbusCoordinator, attach device info
-    gateway_key = get_gateway_key(entry)
+    # STEP 5: Create and store ModbusCoordinator, attach device info
     try:
+        from .coordinator import ModbusCoordinator
+        
         coordinator = ModbusCoordinator(
             hass=hass,
             client=client,
@@ -118,7 +155,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await client.close()
         raise ConfigEntryNotReady(f"Coordinator setup failed: {e}") from e
 
-    # STEP 4: Forward setup to all platforms (sensor, switch, etc.)
+    # CRITICAL FIX: Pre-import platform modules in executor to prevent blocking
+    await _async_import_platforms(hass, PLATFORMS)
+
+    # STEP 6: Forward setup to all platforms (sensor, switch, etc.)
     try:
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     except Exception as e:
@@ -126,14 +166,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await async_unload_entry(hass, entry)
         raise ConfigEntryNotReady(f"Platform setup failed: {e}") from e
 
-    # STEP 4.5: Set up services for polling optimization
+    # STEP 7: Set up services for polling optimization
     try:
+        from .services import async_setup_services
         await async_setup_services(hass)
     except Exception as e:
         _LOGGER.exception("Error setting up services: %s", e)
         # Non-critical error, continue setup
 
-    # STEP 4.6: Trigger coordinator's first refresh
+    # STEP 8: Trigger coordinator's first refresh
     try:
         await coordinator.async_config_entry_first_refresh()
     except Exception as e:
@@ -141,7 +182,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await async_unload_entry(hass, entry)
         raise ConfigEntryNotReady(f"Initial refresh failed: {e}") from e
 
-    # STEP 5: Mark coordinator as initialized and fire ready event
+    # STEP 9: Mark coordinator as initialized and fire ready event
     coordinator._initialized = True
     try:
         hass.bus.async_fire(
@@ -153,6 +194,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("Error firing coordinator_ready event: %s", e)
         # Non-critical error, continue setup
         
+    # STEP 10: Initialize statistics collection for this coordinator
+    try:
+        from .statistics import STATISTICS_MANAGER
+        
+        await hass.async_add_executor_job(
+            STATISTICS_MANAGER.register_coordinator, 
+            gateway_key, 
+            coordinator
+        )
+        _LOGGER.info("Statistics collection initialized for %s", gateway_key)
+    except Exception as e:
+        _LOGGER.warning("Failed to initialize statistics collection: %s", e)
+        # Non-critical error, continue setup
+        
     # Show polling optimization information message
     _LOGGER.info(
         "🔍 Modbus Local Gateway now includes polling optimization statistics! "
@@ -162,23 +217,48 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_unload_entry(hass, entry):
     """Unload a config entry."""
-    gateway_key = get_gateway_key(entry)
-    if gateway_key not in hass.data.get(DOMAIN, {}):
+    # Import needed modules only when this function is called
+    from homeassistant.const import CONF_HOST, CONF_PORT
+    from .const import CONF_SLAVE_ID
+    
+    # Define helper function inside to avoid top-level import
+    def get_gateway_key(entry_data, with_slave=True):
+        try:
+            if with_slave:
+                return f"{entry_data[CONF_HOST]}:{entry_data[CONF_PORT]}:{entry_data[CONF_SLAVE_ID]}"
+            return f"{entry_data[CONF_HOST]}:{entry_data[CONF_PORT]}"
+        except KeyError:
+            return None
+
+    gateway_key = get_gateway_key(entry.data)
+    if not gateway_key or gateway_key not in hass.data.get(DOMAIN, {}):
         return True
 
     # Unload platforms first
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     
-    # Then clean up coordinator
+    # Clean up coordinator
     coordinator = hass.data[DOMAIN].pop(gateway_key, None)
     if coordinator:
-        if hasattr(coordinator, "close"):
-            try:
-                await coordinator.close()
-            except Exception as e:
-                _LOGGER.error("Error closing coordinator: %s", e)
-                unload_ok = False
+        # Try to unregister from statistics
+        try:
+            from .statistics.manager import STATISTICS_MANAGER
+            await hass.async_add_executor_job(STATISTICS_MANAGER.unregister_coordinator, gateway_key)
+        except Exception as e:
+            _LOGGER.warning(f"Error unregistering from statistics: {e}")
+        
+        # Shut down coordinator
+        try:
+            await coordinator.async_shutdown()
+        except Exception as e:
+            _LOGGER.error(f"Error shutting down coordinator: {e}")
+            unload_ok = False
 
     return unload_ok
+
+async def async_setup(hass, config):
+    """Set up the Modbus Local Gateway component."""
+    # This function is kept as lightweight as possible
+    return True

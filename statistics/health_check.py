@@ -58,6 +58,7 @@ class HealthCheckManager:
         self.storage = StatisticsStorageManager.get_instance()
         self.last_check_time = 0
         self.last_result = None
+        self.hass = None
         
         # Initialize component weights for health score
         self.component_weights = {
@@ -68,8 +69,19 @@ class HealthCheckManager:
             "data_quality": 20,  # High importance - affects analysis quality
         }
     
+    def set_hass(self, hass):
+        """Set Home Assistant instance for async operations.
+        
+        Args:
+            hass: Home Assistant instance
+        """
+        self.hass = hass
+    
     def check_health(self, current_entity_ids: List[str] = None) -> HealthCheckResult:
-        """Run a comprehensive health check.
+        """Run a comprehensive health check. WARNING: Contains blocking calls!
+        
+        This method should not be called directly from the event loop.
+        Use async_check_health instead when in an async context.
         
         Args:
             current_entity_ids: List of current entity IDs in Home Assistant
@@ -91,8 +103,40 @@ class HealthCheckManager:
         # Generate recommendations
         self._generate_recommendations(result, validation_report)
         
-        # Add system metrics
-        self._add_system_metrics(result)
+        # Add system metrics (blocking)
+        self._blocking_add_system_metrics(result)
+        
+        self.last_result = result
+        return result
+    
+    async def async_check_health(self, current_entity_ids: List[str] = None) -> HealthCheckResult:
+        """Run a comprehensive health check asynchronously.
+        
+        Args:
+            current_entity_ids: List of current entity IDs in Home Assistant
+            
+        Returns:
+            HealthCheckResult object
+        """
+        if not self.hass:
+            raise RuntimeError("Home Assistant instance not set. Call set_hass() first.")
+            
+        self.last_check_time = time.time()
+        
+        # Create result object
+        result = HealthCheckResult()
+        
+        # Run validation (assuming it's not blocking; if it is, should be moved to executor)
+        validation_report = self.validation_manager.validate_all(current_entity_ids)
+        
+        # Calculate health score based on validation results
+        self._calculate_health_score(result, validation_report)
+        
+        # Generate recommendations
+        self._generate_recommendations(result, validation_report)
+        
+        # Add system metrics (non-blocking)
+        await self._async_add_system_metrics(result)
         
         self.last_result = result
         return result
@@ -282,8 +326,10 @@ class HealthCheckManager:
                     "manual_action": "Review entity activity and consider excluding from analysis"
                 })
     
-    def _add_system_metrics(self, result: HealthCheckResult) -> None:
-        """Add system metrics to health check result.
+    def _blocking_add_system_metrics(self, result: HealthCheckResult) -> None:
+        """Add system metrics to health check result - BLOCKING VERSION.
+        
+        Warning: This method contains blocking calls and should not be used in the event loop.
         
         Args:
             result: HealthCheckResult to update
@@ -349,9 +395,11 @@ class HealthCheckManager:
             import psutil
             process = psutil.Process(os.getpid())
             
+            # THIS IS THE BLOCKING CALL THAT CAUSES THE WARNING:
+            # We keep it here in the blocking version, but create a non-blocking alternative
             result.metrics["runtime"] = {
                 "memory_mb": round(process.memory_info().rss / (1024 * 1024), 1),
-                "cpu_percent": process.cpu_percent(interval=0.1),
+                "cpu_percent": process.cpu_percent(interval=0.1),  # This blocks for 0.1 seconds
                 "uptime_seconds": int(time.time() - process.create_time())
             }
         except ImportError:
@@ -363,3 +411,37 @@ class HealthCheckManager:
         
         # Add timestamp
         result.metrics["current_time"] = datetime.utcnow().isoformat()
+    
+    def _add_system_metrics(self, result: HealthCheckResult) -> None:
+        """Add system metrics to health check result.
+        
+        Warning: Contains blocking calls, use async_add_system_metrics when in event loop.
+        
+        Args:
+            result: HealthCheckResult to update
+        """
+        # This just calls the blocking implementation
+        # WARNING: This is a blocking call
+        self._blocking_add_system_metrics(result)
+    
+    async def _async_add_system_metrics(self, result: HealthCheckResult) -> None:
+        """Add system metrics to health check result asynchronously.
+        
+        Args:
+            result: HealthCheckResult to update
+        """
+        if not self.hass:
+            raise RuntimeError("Home Assistant instance not set. Call set_hass() first.")
+        
+        # Run the blocking operation in the executor
+        def _get_metrics():
+            # Create a dummy result to collect metrics
+            dummy_result = HealthCheckResult()
+            self._blocking_add_system_metrics(dummy_result)
+            return dummy_result.metrics
+            
+        # Execute the blocking operation in a thread
+        metrics = await self.hass.async_add_executor_job(_get_metrics)
+        
+        # Copy the metrics to our actual result
+        result.metrics.update(metrics)

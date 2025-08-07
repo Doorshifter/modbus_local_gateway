@@ -719,3 +719,7 @@ class ModbusStatisticsManager:
         except Exception as e:
             _LOGGER.error("Error setting parameter: %s", e)
             return {"success": False, "error": str(e)}
+          
+
+# Create singleton instance
+STATISTICS_MANAGER = ModbusStatisticsManager.get_instance()

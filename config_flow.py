@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.config_entries import (
@@ -26,9 +26,6 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .entity_management.device_loader import create_device_info, load_devices
-from .entity_management.modbus_device_info import ModbusDeviceInfo
-from .tcp_client import AsyncModbusTcpClientGateway
 
 _LOGGER: logging.Logger = logging.getLogger(__name__)
 
@@ -40,7 +37,7 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
 
     def __init__(self) -> None:
         """Initialise Modbus Local Gateway flow."""
-        self.client: AsyncModbusTcpClientGateway | None = None
+        self.client = None
         self.data = {}
 
     def is_matching(self, other_flow: ConfigFlowHandler) -> bool:
@@ -74,6 +71,9 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 "Config flow received scan_interval: %s", 
                 user_input.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
             )
+            
+            # Import here to avoid circular imports
+            from .tcp_client import AsyncModbusTcpClientGateway
             
             self.client = AsyncModbusTcpClientGateway.async_get_client_connection(
                 host=user_input[CONF_HOST], port=user_input[CONF_PORT]
@@ -126,6 +126,10 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
                 
             return await self.async_create()
 
+        # Import here to avoid circular imports
+        from .entity_management.device_loader import load_devices
+        from .entity_management.modbus_device_info import ModbusDeviceInfo
+        
         devices: dict[str, ModbusDeviceInfo] = await load_devices(self.hass)
         devices_data: dict[str, str] = {
             item[0]: f"{item[1].manufacturer or 'Unknown'} {item[1].model or 'Unknown'}"
@@ -144,6 +148,10 @@ class ConfigFlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def async_create(self) -> ConfigFlowResult:
         """Create the entry if we can"""
+        # Import here to avoid circular imports
+        from .entity_management.device_loader import create_device_info
+        from .entity_management.modbus_device_info import ModbusDeviceInfo
+        
         device_info: ModbusDeviceInfo = await self.hass.async_add_executor_job(
             create_device_info, self.hass, self.data[CONF_FILENAME]
         )

@@ -17,8 +17,9 @@ import math
 import threading
 import copy
 from enum import Enum
+from pathlib import Path
 
-from .persistent_statistics import StatisticsStorageManager
+from .persistent_statistics import PERSISTENT_STATISTICS_MANAGER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -523,8 +524,9 @@ class AdaptiveParameterManager:
     
     def __init__(self):
         """Initialize parameter manager."""
-        # Use persistent statistics storage for parameter storage
-        self.storage = StatisticsStorageManager()
+        # We'll defer actual storage operations until we know the storage system is ready
+        self._storage_ready = False
+        self._initialization_attempted = False
         
         # Initialize context provider
         self.context_provider = ContextProvider()
@@ -552,28 +554,88 @@ class AdaptiveParameterManager:
         # Lock for thread safety
         self.lock = threading.RLock()
         
-        # Load data from storage
-        self._load_data()
-        
-        # Set up default profiles if none exist
-        if not self.profiles:
-            self._setup_default_profiles()
-        
-        # Initialize current parameters from defaults
+        # We'll initialize defaults right away, but defer loading from storage
+        self._setup_default_profiles()
         self._initialize_current_parameters()
-        
-        # Register standard context providers
         self._register_standard_context_providers()
         
-        _LOGGER.info("Adaptive parameter manager initialized with %d profiles", len(self.profiles))
+        _LOGGER.info("Adaptive parameter manager initialized with default profiles")
+    
+    def ensure_storage_ready(self):
+        """Ensure storage is initialized and ready to use.
+        
+        Returns:
+            True if storage is ready, False otherwise
+        """
+        if self._storage_ready:
+            return True
+            
+        if not self._initialization_attempted:
+            self._initialization_attempted = True
+            try:
+                # Check if the storage manager is initialized and has storage
+                if (PERSISTENT_STATISTICS_MANAGER.enabled and 
+                    hasattr(PERSISTENT_STATISTICS_MANAGER, 'storage') and 
+                    PERSISTENT_STATISTICS_MANAGER.storage is not None and
+                    hasattr(PERSISTENT_STATISTICS_MANAGER.storage, 'get_metadata_file')):
+                    
+                    self._storage_ready = True
+                    # Now that storage is ready, load data
+                    self._load_data()
+                    _LOGGER.info("Successfully connected to persistent storage")
+                    return True
+                else:
+                    _LOGGER.warning("Storage not yet initialized - using defaults")
+                    return False
+            except Exception as e:
+                _LOGGER.error("Error checking storage readiness: %s", e)
+                return False
+        return False
+    
+    def initialize_storage(self, base_path: Path = None) -> bool:
+        """Explicitly initialize storage if not already initialized.
+        
+        Args:
+            base_path: Optional base path to use for storage
+        
+        Returns:
+            True if initialization was successful or storage was already initialized
+        """
+        if self._storage_ready:
+            return True
+            
+        try:
+            # Check if PERSISTENT_STATISTICS_MANAGER is already initialized
+            if PERSISTENT_STATISTICS_MANAGER.enabled:
+                self._storage_ready = True
+                self._load_data()
+                _LOGGER.info("Connected to already initialized storage")
+                return True
+                
+            # If base_path is provided, try to initialize
+            if base_path and not PERSISTENT_STATISTICS_MANAGER.enabled:
+                PERSISTENT_STATISTICS_MANAGER.initialize(base_path)
+                self._storage_ready = True
+                self._load_data()
+                _LOGGER.info("Initialized storage with base path: %s", base_path)
+                return True
+                
+            return False
+        except Exception as e:
+            _LOGGER.error("Failed to initialize storage: %s", e)
+            return False
     
     def _load_data(self) -> None:
         """Load parameter data from storage."""
         try:
+            if not self.ensure_storage_ready():
+                return
+                
             # Get metadata file with profiles and parameters
-            data = self.storage.get_metadata_file("adaptive_parameters")
+            data = PERSISTENT_STATISTICS_MANAGER.storage.get_metadata_file("adaptive_parameters")
             
             if not data:
+                _LOGGER.debug("No adaptive parameter data found in storage")
                 return
                 
             # Load profiles
@@ -581,6 +643,7 @@ class AdaptiveParameterManager:
                 try:
                     profile = ParameterProfile.from_dict(profile_data)
                     self.profiles[profile.name] = profile
+                    _LOGGER.debug("Loaded profile: %s", profile.name)
                 except Exception as e:
                     _LOGGER.error("Error loading profile %s: %s", 
                                 profile_data.get("name", "unknown"), e)
@@ -606,12 +669,18 @@ class AdaptiveParameterManager:
                     
             self.adaptation_count = data.get("adaptation_count", 0)
             
+            _LOGGER.info("Loaded %d profiles from storage", len(self.profiles))
+            
         except Exception as e:
             _LOGGER.error("Error loading parameter data: %s", e)
     
     def _save_data(self) -> None:
         """Save parameter data to storage."""
         try:
+            if not self.ensure_storage_ready():
+                _LOGGER.warning("Cannot save parameters - storage not ready")
+                return
+                
             data = {
                 "profiles": [profile.to_dict() for profile in self.profiles.values()],
                 "active_profile": self.active_profile_name,
@@ -622,7 +691,8 @@ class AdaptiveParameterManager:
                 "last_updated": datetime.utcnow().isoformat()
             }
             
-            self.storage.save_metadata_file("adaptive_parameters", data)
+            PERSISTENT_STATISTICS_MANAGER.storage.save_metadata_file("adaptive_parameters", data)
+            _LOGGER.debug("Saved parameter data to storage")
         except Exception as e:
             _LOGGER.error("Error saving parameter data: %s", e)
     
@@ -806,6 +876,9 @@ class AdaptiveParameterManager:
         Returns:
             Parameter value
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             return self.current_parameters.get(name, default)
     
@@ -836,6 +909,10 @@ class AdaptiveParameterManager:
             # Add to history
             self._add_to_parameter_history(name, value)
             
+            # Save if storage is ready
+            if self._storage_ready:
+                self._save_data()
+                
             return True
     
     def set_parameter_constraints(self, name: str, constraints: Dict[str, Any]) -> bool:
@@ -865,8 +942,9 @@ class AdaptiveParameterManager:
                 if max_val is not None and value > max_val:
                     self.current_parameters[name] = max_val
                     
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             return True
     
@@ -896,8 +974,9 @@ class AdaptiveParameterManager:
                 # Initialize with current parameters
                 profile.parameters = copy.deepcopy(self.current_parameters)
                 
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             return profile
     
@@ -921,8 +1000,9 @@ class AdaptiveParameterManager:
             # Delete profile
             del self.profiles[name]
             
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             return True
     
@@ -964,8 +1044,9 @@ class AdaptiveParameterManager:
             self.last_adaptation = datetime.utcnow()
             self.adaptation_count += 1
             
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             _LOGGER.info("Activated parameter profile: %s", name)
             
@@ -1005,6 +1086,9 @@ class AdaptiveParameterManager:
         Returns:
             Dictionary with adaptation results
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             start_time = time.time()
             
@@ -1050,8 +1134,9 @@ class AdaptiveParameterManager:
             
             result["duration_seconds"] = round(time.time() - start_time, 3)
             
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             return result
     
@@ -1067,6 +1152,9 @@ class AdaptiveParameterManager:
         Returns:
             Dictionary with learning results
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             start_time = time.time()
             
@@ -1110,8 +1198,9 @@ class AdaptiveParameterManager:
             
             result["duration_seconds"] = round(time.time() - start_time, 3)
             
-            # Save changes
-            self._save_data()
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
             
             return result
     
@@ -1240,8 +1329,9 @@ class AdaptiveParameterManager:
         if self.active_profile_name in self.profiles:
             profile.context_match = copy.deepcopy(self.profiles[self.active_profile_name].context_match)
             
-        # Save changes
-        self._save_data()
+        # Save changes if storage is ready
+        if self._storage_ready:
+            self._save_data()
         
         return profile_name
     
@@ -1272,10 +1362,14 @@ class AdaptiveParameterManager:
         Returns:
             Status information
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             return {
                 "active_profile": self.active_profile_name,
                 "profile_count": len(self.profiles),
+                "storage_ready": self._storage_ready,
                 "profiles": {
                     name: {
                         "description": profile.description,
@@ -1303,6 +1397,9 @@ class AdaptiveParameterManager:
         Returns:
             Profile data or None if not found
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             if name not in self.profiles:
                 return None
@@ -1315,6 +1412,9 @@ class AdaptiveParameterManager:
         Returns:
             Dictionary of profile name to profile data
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             return {
                 name: profile.to_dict()
@@ -1327,6 +1427,9 @@ class AdaptiveParameterManager:
         Returns:
             Dictionary of parameter name to value
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             return copy.deepcopy(self.current_parameters)
     
@@ -1336,9 +1439,34 @@ class AdaptiveParameterManager:
         Returns:
             List of parameter changes
         """
+        # Try to ensure storage is ready (non-blocking)
+        self.ensure_storage_ready()
+        
         with self.lock:
             return copy.deepcopy(self.parameter_history)
+    
+    def reset_to_defaults(self) -> bool:
+        """Reset to default profiles and parameters.
+        
+        Returns:
+            True if reset was successful
+        """
+        with self.lock:
+            # Clear existing profiles and parameters
+            self.profiles = {}
+            self.current_parameters = {}
+            
+            # Re-initialize with defaults
+            self._setup_default_profiles()
+            self._initialize_current_parameters()
+            
+            # Save changes if storage is ready
+            if self._storage_ready:
+                self._save_data()
+                
+            _LOGGER.info("Reset parameter manager to default settings")
+            return True
 
 
-# Global instance
+# Global singleton instance
 PARAMETER_MANAGER = AdaptiveParameterManager.get_instance()

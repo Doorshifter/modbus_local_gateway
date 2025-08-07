@@ -13,6 +13,7 @@ import logging
 import os
 import shutil
 import time
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, Set
@@ -296,6 +297,85 @@ class StatisticsStorageManager:
         except Exception as e:
             _LOGGER.error("Error saving storage metadata: %s", e)
             return False
+
+    def get_interval_history(self, entity_id=None, start_time=None, end_time=None):
+        """Get interval history for entities.
+        
+        Args:
+            entity_id: Optional entity ID to filter by
+            start_time: Optional start time for filtering
+            end_time: Optional end time for filtering
+            
+        Returns:
+            Dictionary mapping entity IDs to their interval histories
+        """
+        try:
+            # Use in-memory cache if available
+            if self._interval_history_cache:
+                history = self._interval_history_cache
+            else:
+                # Try enhanced storage first
+                interval_history_path = self.metadata_path / "interval_history.json"
+                if interval_history_path.exists():
+                    try:
+                        with open(interval_history_path, "r") as f:
+                            history = json.load(f)
+                    except Exception as e:
+                        _LOGGER.warning("Failed to load interval history from enhanced storage: %s", e)
+                        history = {}
+                # Then try original storage
+                elif self.interval_history_path.exists():
+                    try:
+                        with open(self.interval_history_path, "r") as f:
+                            history = json.load(f)
+                    except Exception as e:
+                        _LOGGER.warning("Failed to load interval history from original storage: %s", e)
+                        history = {}
+                else:
+                    history = {}
+                
+                # Cache the result
+                self._interval_history_cache = history
+            
+            # Filter by entity if requested
+            if entity_id:
+                if isinstance(history, dict) and "entities" in history:
+                    # Handle structure with "entities" key
+                    entities_data = history.get("entities", {})
+                    result = {entity_id: entities_data.get(entity_id, {})}
+                else:
+                    # Handle direct entity mapping structure
+                    result = {entity_id: history.get(entity_id, [])}
+                
+                # Apply time filters if specified
+                if start_time or end_time:
+                    for ent_id, ent_data in result.items():
+                        # Handle both dictionary and list formats
+                        if isinstance(ent_data, dict) and "history" in ent_data:
+                            filtered_history = []
+                            for item in ent_data["history"]:
+                                item_time = item.get("timestamp", 0)
+                                if (not start_time or item_time >= start_time) and \
+                                   (not end_time or item_time <= end_time):
+                                    filtered_history.append(item)
+                            ent_data["history"] = filtered_history
+                        elif isinstance(ent_data, list):
+                            filtered_history = []
+                            for item in ent_data:
+                                item_time = item.get("timestamp", 0)
+                                if (not start_time or item_time >= start_time) and \
+                                   (not end_time or item_time <= end_time):
+                                    filtered_history.append(item)
+                            result[ent_id] = filtered_history
+                
+                return result
+            
+            # Return all history data if no entity_id specified
+            return history
+        except Exception as e:
+            _LOGGER.error("Error loading interval history: %s", e)
+            return {} if entity_id else {"entities": {}}
+            
     
     def _check_auto_compaction(self) -> None:
         """Check if auto-compaction should run."""
@@ -624,19 +704,6 @@ class StatisticsStorageManager:
         
         return True
     
-    def get_interval_history(self) -> Dict[str, List[Dict[str, Any]]]:
-        """Get interval optimization history."""
-        # First try enhanced storage
-        interval_history_path = self.metadata_path / "interval_history.json"
-        if interval_history_path.exists():
-            try:
-                with open(interval_history_path, "r") as f:
-                    return json.load(f)
-            except Exception as e:
-                _LOGGER.warning("Failed to load interval history from enhanced storage: %s", e)
-        
-        # Fall back to original cache
-        return self._interval_history_cache
     
     def clear_storage(self, data_type: Optional[str] = None) -> bool:
         """Clear storage data.
@@ -1378,3 +1445,66 @@ class StatisticsStorageManager:
             result["interval_history"] = self.get_interval_history()
         
         return result
+        
+    def initialize_storage(self):
+        """Initialize storage by ensuring files exist.
+        
+        Returns:
+            True if initialization was successful, False otherwise
+        """
+        try:
+            # Ensure base directory exists
+            self.base_path.mkdir(parents=True, exist_ok=True)
+            
+            # Check if required files exist
+            if not self._check_required_files_exist():
+                # Create initial file structure
+                self._create_initial_files()
+            
+            return True
+        except Exception as e:
+            _LOGGER.error("Failed to initialize storage: %s", e)
+            return False
+        
+    def _check_required_files_exist(self):
+        """Check if all required files exist.
+        
+        Returns:
+            True if all required files exist, False otherwise
+        """
+        required_files = [
+            "meta.json",
+            "entity_stats.json",
+            "patterns.json",
+            "clusters.json"
+        ]
+        
+        for filename in required_files:
+            file_path = self.base_path / filename
+            if not file_path.exists():
+                return False
+        
+        return True
+    
+    def get_entity_stats(self):
+        """Get entity statistics.
+        
+        Returns:
+            Dictionary of entity statistics
+        """
+        # If the file doesn't exist, create an empty one
+        entity_stats_path = self.base_path / "entity_stats.json"
+        if not entity_stats_path.exists():
+            try:
+                with open(entity_stats_path, "w") as f:
+                    json.dump({}, f)
+            except Exception as e:
+                _LOGGER.error("Error creating entity_stats.json: %s", e)
+        
+        # Now try to read it
+        try:
+            with open(entity_stats_path, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            _LOGGER.error("Error reading entity_stats.json: %s", e)
+            return {}

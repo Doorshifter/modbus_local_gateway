@@ -1,29 +1,20 @@
 """Modbus Local Gateway Text Entity"""
 
-from __future__ import annotations
-
-import asyncio
 import logging
 
-from homeassistant.components.text import TextEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+# Minimal top-level imports
+_LOGGER = logging.getLogger(__name__)
+DOMAIN = "modbus_local_gateway"
 
-from .context import ModbusContext
-from .coordinator import ModbusCoordinator
-from .entity_management.base import ModbusTextEntityDescription
-from .entity_management.const import ControlType, ModbusDataType
-from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-from .helpers import async_setup_entities
-
-_LOGGER: logging.Logger = logging.getLogger(__name__)
-
-async def async_setup_entry(
-    hass,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Set up Modbus text entities for the config entry."""
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up the text platform."""
+    # Import modules only when needed
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    
+    from .entity_management.const import ControlType
+    from .helpers import async_setup_entities
+    
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -32,21 +23,37 @@ async def async_setup_entry(
         entity_class=ModbusTextEntity,
     )
 
-class ModbusTextEntity(ModbusCoordinatorEntity, TextEntity):
+class ModbusTextEntity:
     """Text entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator: ModbusCoordinator,
-        modbus_context: ModbusContext,
+        coordinator,
+        modbus_context,
         device,
-    ) -> None:
+    ):
         """Initialize the Modbus text entity."""
-        super().__init__(
+        # Import needed modules inside the method
+        import asyncio
+        from homeassistant.components.text import TextEntity
+        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+        from .entity_management.base import ModbusTextEntityDescription
+        
+        # Multiple inheritance using class objects dynamically loaded
+        self.__class__ = type(
+            self.__class__.__name__,
+            (ModbusCoordinatorEntity, TextEntity),
+            {}
+        )
+        
+        # Initialize parent classes using super()
+        ModbusCoordinatorEntity.__init__(
+            self,
             coordinator=coordinator,
             modbus_context=modbus_context,
             device_info=device
         )
+        
         if not isinstance(modbus_context.desc, ModbusTextEntityDescription):
             raise TypeError("Invalid description type")
             
@@ -59,7 +66,7 @@ class ModbusTextEntity(ModbusCoordinatorEntity, TextEntity):
         return self.native_value
 
     @property
-    def native_value(self) -> str | None:
+    def native_value(self):
         """Return the value of the text entity."""
         # Safe access to entity key
         key = getattr(self.entity_description, "key", None) if hasattr(self, "entity_description") else None
@@ -69,7 +76,7 @@ class ModbusTextEntity(ModbusCoordinatorEntity, TextEntity):
         value = self.coordinator.data.get(key) if key else None
         return str(value) if value is not None else None
 
-    def _generate_extra_attributes(self) -> dict:
+    def _generate_extra_attributes(self):
         """Add text-specific attributes."""
         attrs = super()._generate_extra_attributes()
         
@@ -83,13 +90,17 @@ class ModbusTextEntity(ModbusCoordinatorEntity, TextEntity):
         
         return attrs
     
-    def set_value(self, value: str) -> None:
+    def set_value(self, value):
         """Synchronously set the value of the Modbus text entity."""
+        import asyncio
         future = asyncio.run_coroutine_threadsafe(self.async_set_value(value), self.hass.loop)
         future.result()
 
-    async def async_set_value(self, value: str) -> None:
+    async def async_set_value(self, value):
         """Asynchronously set the value of the Modbus text entity."""
+        # Import needed modules inside the method
+        from .entity_management.const import ModbusDataType
+        
         # Safe access to entity description
         if hasattr(self, "entity_description"):
             desc = self.entity_description

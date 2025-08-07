@@ -85,6 +85,7 @@ class ValidationManager:
         self.last_validation_time = 0
         self.validation_results: Dict[str, ValidationResult] = {}
         self.overall_status = "unknown"
+        self.hass = None
         
         # Define required files
         self.required_files = [
@@ -101,6 +102,49 @@ class ValidationManager:
         for component in ["file_structure", "entity_consistency", "clusters", 
                           "scan_intervals", "data_quality", "overall"]:
             self.validation_results[component] = ValidationResult(component)
+        
+        # Check if required files exist, create them if missing
+        self._initialize_storage_if_needed()
+    
+    def set_hass(self, hass):
+        """Set Home Assistant instance for async operations.
+        
+        Args:
+            hass: Home Assistant instance
+        """
+        self.hass = hass
+    
+    def _initialize_storage_if_needed(self):
+        """Initialize storage files if they don't exist."""
+        # Check if base directory exists and required files are present
+        missing_files = []
+        for filename in self.required_files:
+            file_path = self.storage.base_path / filename
+            if not file_path.exists():
+                missing_files.append(filename)
+        
+        if missing_files:
+            _LOGGER.info("First-time setup: Creating required storage files")
+            try:
+                result = self.create_missing_files()
+                _LOGGER.info("Created files: %s", result["created_files"])
+                if result["failed_creations"]:
+                    _LOGGER.error("Failed to create some files: %s", result["failed_creations"])
+            except Exception as e:
+                _LOGGER.error("Failed to initialize storage files: %s", e)
+    
+    async def async_validate_all(self, hass, current_entity_ids: List[str] = None) -> Dict[str, Any]:
+        """Run all validation checks asynchronously.
+        
+        Args:
+            hass: Home Assistant instance
+            current_entity_ids: List of currently active entity IDs
+            
+        Returns:
+            Dictionary with validation results
+        """
+        self.set_hass(hass)
+        return await hass.async_add_executor_job(self.validate_all, current_entity_ids)
     
     def validate_all(self, current_entity_ids: List[str] = None) -> Dict[str, Any]:
         """Run all validation checks.
@@ -117,6 +161,9 @@ class ValidationManager:
         # Reset overall status
         self.overall_status = "pass"
         
+        # Make sure storage is initialized
+        self._initialize_storage_if_needed()
+        
         # File structure validation
         file_result = self.validate_file_structure()
         if file_result.status == "fail":
@@ -131,18 +178,59 @@ class ValidationManager:
                 file_result.errors
             )
             
-            # Prepare simplified result
-            self.validation_results["overall"] = ValidationResult("overall")
-            self.validation_results["overall"].status = "fail"
-            self.validation_results["overall"].add_error(
-                "File structure validation failed, fix these issues first"
-            )
-            self.validation_results["overall"].details = {
-                "file_structure_errors": file_result.errors,
-                "validation_time_ms": int((time.time() - start_time) * 1000)
-            }
-            
-            return self._prepare_validation_report()
+            # Attempt to fix the file structure issues automatically
+            if any(error.startswith("Required file missing:") for error in file_result.errors):
+                _LOGGER.info("Attempting to fix missing files automatically")
+                try:
+                    result = self.create_missing_files()
+                    _LOGGER.info("Created files: %s", result["created_files"])
+                    if not result["failed_creations"]:
+                        _LOGGER.info("All required files created successfully, validation can proceed")
+                        # Re-validate file structure
+                        file_result = self.validate_file_structure()
+                        if file_result.status != "fail":
+                            _LOGGER.info("File structure validation now passed, continuing with validation")
+                            # Continue with validation
+                        else:
+                            # Prepare simplified result
+                            self.validation_results["overall"] = ValidationResult("overall")
+                            self.validation_results["overall"].status = "fail"
+                            self.validation_results["overall"].add_error(
+                                "File structure validation still failed after attempting to fix"
+                            )
+                            self.validation_results["overall"].details = {
+                                "file_structure_errors": file_result.errors,
+                                "validation_time_ms": int((time.time() - start_time) * 1000)
+                            }
+                            
+                            return self._prepare_validation_report()
+                except Exception as e:
+                    _LOGGER.error("Failed to fix file structure issues: %s", e)
+                    # Prepare simplified result
+                    self.validation_results["overall"] = ValidationResult("overall")
+                    self.validation_results["overall"].status = "fail"
+                    self.validation_results["overall"].add_error(
+                        f"Failed to fix file structure issues: {e}"
+                    )
+                    self.validation_results["overall"].details = {
+                        "file_structure_errors": file_result.errors,
+                        "validation_time_ms": int((time.time() - start_time) * 1000)
+                    }
+                    
+                    return self._prepare_validation_report()
+            else:
+                # Prepare simplified result
+                self.validation_results["overall"] = ValidationResult("overall")
+                self.validation_results["overall"].status = "fail"
+                self.validation_results["overall"].add_error(
+                    "File structure validation failed, fix these issues first"
+                )
+                self.validation_results["overall"].details = {
+                    "file_structure_errors": file_result.errors,
+                    "validation_time_ms": int((time.time() - start_time) * 1000)
+                }
+                
+                return self._prepare_validation_report()
         
         # Entity consistency validation
         if current_entity_ids is not None:
@@ -206,6 +294,29 @@ class ValidationManager:
         
         return self._prepare_validation_report()
     
+    def _blocking_read_json_file(self, file_path: Path) -> Tuple[bool, Dict, str]:
+        """Read JSON from file - blocking version.
+        
+        Args:
+            file_path: Path to file
+            
+        Returns:
+            Tuple of (success, data, error_message)
+        """
+        try:
+            if not os.path.exists(file_path):
+                return False, {}, f"File not found: {file_path}"
+            
+            with open(file_path, "r") as f:
+                data = json.load(f)
+            return True, data, ""
+        except json.JSONDecodeError as e:
+            return False, {}, f"JSON decode error: {e}"
+        except IOError as e:
+            return False, {}, f"IO error: {e}"
+        except Exception as e:
+            return False, {}, f"Unexpected error: {e}"
+    
     def validate_file_structure(self) -> ValidationResult:
         """Validate file structure.
         
@@ -257,29 +368,23 @@ class ValidationManager:
             result.add_info("All files passed schema validation")
         
         # Check version consistency
-        try:
-            with open(self.storage.meta_path, "r") as f:
-                meta_data = json.load(f)
-                meta_version = meta_data.get("version")
+        success, meta_data, error = self._blocking_read_json_file(self.storage.meta_path)
+        if success:
+            meta_version = meta_data.get("version")
             
             # Check versions in other files
             version_inconsistencies = []
             
             for file_type, filename in meta_data.get("files", {}).items():
                 file_path = self.storage.base_path / filename
-                if file_path.exists():
-                    try:
-                        with open(file_path, "r") as f:
-                            file_data = json.load(f)
-                            if isinstance(file_data, dict) and "version" in file_data:
-                                file_version = file_data["version"]
-                                if file_version != meta_version:
-                                    version_inconsistencies.append(
-                                        f"{file_type}: expected {meta_version}, got {file_version}"
-                                    )
-                    except (json.JSONDecodeError, IOError):
-                        # Already reported in schema validation
-                        pass
+                success, file_data, _ = self._blocking_read_json_file(file_path)
+                if success:
+                    if isinstance(file_data, dict) and "version" in file_data:
+                        file_version = file_data["version"]
+                        if file_version != meta_version:
+                            version_inconsistencies.append(
+                                f"{file_type}: expected {meta_version}, got {file_version}"
+                            )
             
             if version_inconsistencies:
                 for inconsistency in version_inconsistencies:
@@ -288,10 +393,6 @@ class ValidationManager:
             else:
                 result.add_info(f"All files have consistent version: {meta_version}")
                 result.details["version"] = meta_version
-        
-        except (json.JSONDecodeError, IOError) as e:
-            # This would have been caught in meta validation
-            pass
         
         # Add file size information
         try:
@@ -712,6 +813,19 @@ class ValidationManager:
             }
         }
     
+    async def async_fix_issues(self, hass, issues_to_fix: List[str] = None) -> Dict[str, Any]:
+        """Fix validation issues automatically asynchronously.
+        
+        Args:
+            hass: Home Assistant instance
+            issues_to_fix: List of issue types to fix, or None for all fixable issues
+            
+        Returns:
+            Dictionary with fix results
+        """
+        self.set_hass(hass)
+        return await hass.async_add_executor_job(self.fix_issues, issues_to_fix)
+    
     def fix_issues(self, issues_to_fix: List[str] = None) -> Dict[str, Any]:
         """Fix validation issues automatically.
         
@@ -865,6 +979,18 @@ class ValidationManager:
                 })
         
         return results
+    
+    async def async_create_missing_files(self, hass) -> Dict[str, Any]:
+        """Create missing required files with empty structures asynchronously.
+        
+        Args:
+            hass: Home Assistant instance
+            
+        Returns:
+            Dictionary with creation results
+        """
+        self.set_hass(hass)
+        return await hass.async_add_executor_job(self.create_missing_files)
     
     def create_missing_files(self) -> Dict[str, Any]:
         """Create missing required files with empty structures.
