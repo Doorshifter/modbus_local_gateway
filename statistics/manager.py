@@ -31,6 +31,7 @@ class ModbusStatisticsManager:
     def __init__(self, hass=None):
         """Initialize statistics manager."""
         self._hass = hass
+        self.hass = hass  # Added for compatibility with __init__.py
         self._entity_trackers: Dict[str, StatisticsTracker] = {}
         
         # Use persistent components from the persistent statistics manager
@@ -49,12 +50,82 @@ class ModbusStatisticsManager:
         self._cached_entity_stats: Dict[str, Dict[str, Any]] = {}
         self._last_stats_update: float = 0
         
+        # Added for coordinator tracking
+        self.coordinators: Dict[str, Any] = {}
+        self._statistics: Dict[str, Dict[str, Any]] = {}
+        self._initialized = False
+        
         # Set up adaptive parameters integration
         self._initialize_adaptive_parameters()
         
         # Initialize pattern-correlation integration
         if self._pattern_detector and self._correlation_manager:
             self._initialize_pattern_correlation_integration()
+
+    def ensure_initialized(self) -> bool:
+        """Ensure the manager is fully initialized."""
+        if self._initialized:
+            return True
+            
+        try:
+            # Initialize components that might not be ready
+            if not self._pattern_detector:
+                self._pattern_detector = PERSISTENT_STATISTICS_MANAGER.pattern_detector
+                
+            if not self._correlation_manager:
+                self._correlation_manager = PERSISTENT_STATISTICS_MANAGER.correlation_manager
+            
+            # Set initialization flag
+            self._initialized = True
+            _LOGGER.info("Statistics manager fully initialized")
+            return True
+        except Exception as e:
+            _LOGGER.error("Error initializing statistics manager: %s", e)
+            return False
+            
+    def register_coordinator(self, gateway_key: str, coordinator) -> None:
+        """Register a coordinator for statistics tracking."""
+        if not self._initialized and not self.ensure_initialized():
+            _LOGGER.warning("Cannot register coordinator - statistics manager not initialized")
+            return
+            
+        try:
+            self.coordinators[gateway_key] = coordinator
+            self._statistics[gateway_key] = {
+                "register_reads": 0,
+                "register_writes": 0,
+                "failed_reads": 0,
+                "failed_writes": 0,
+                "last_read_time": 0,
+                "last_write_time": 0,
+                "read_times": [],
+                "write_times": [],
+                "error_count": 0,
+                "entities": set(),
+                "first_seen": datetime.utcnow().isoformat(),
+                "last_updated": datetime.utcnow().isoformat()
+            }
+            _LOGGER.info(f"Registered coordinator for gateway {gateway_key}")
+        except Exception as e:
+            _LOGGER.error("Error registering coordinator: %s", e)
+            
+    def unregister_coordinator(self, gateway_key: str) -> None:
+        """Unregister a coordinator."""
+        try:
+            if gateway_key in self.coordinators:
+                self.coordinators.pop(gateway_key)
+                _LOGGER.info(f"Unregistered coordinator for gateway {gateway_key}")
+                
+            if gateway_key in self._statistics:
+                self._statistics.pop(gateway_key)
+        except Exception as e:
+            _LOGGER.error("Error unregistering coordinator: %s", e)
+            
+    def get_gateway_statistics(self, gateway_key: str) -> Dict[str, Any]:
+        """Get statistics for a gateway."""
+        if gateway_key in self._statistics:
+            return self._statistics[gateway_key]
+        return {}
 
     def get_interval_system_overview(self) -> Dict[str, Any]:
         """Get system-wide interval optimization overview.

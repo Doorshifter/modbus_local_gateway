@@ -113,6 +113,8 @@ class ValidationManager:
             hass: Home Assistant instance
         """
         self.hass = hass
+        if self.storage_validator:
+            self.storage_validator.set_hass(hass)
     
     def _initialize_storage_if_needed(self):
         """Initialize storage files if they don't exist."""
@@ -133,18 +135,19 @@ class ValidationManager:
             except Exception as e:
                 _LOGGER.error("Failed to initialize storage files: %s", e)
     
-    async def async_validate_all(self, hass, current_entity_ids: List[str] = None) -> Dict[str, Any]:
+    async def async_validate_all(self, current_entity_ids: List[str] = None) -> Dict[str, Any]:
         """Run all validation checks asynchronously.
         
         Args:
-            hass: Home Assistant instance
             current_entity_ids: List of currently active entity IDs
             
         Returns:
             Dictionary with validation results
         """
-        self.set_hass(hass)
-        return await hass.async_add_executor_job(self.validate_all, current_entity_ids)
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_all, current_entity_ids)
+        # Fallback to synchronous if no hass available
+        return self.validate_all(current_entity_ids)
     
     def validate_all(self, current_entity_ids: List[str] = None) -> Dict[str, Any]:
         """Run all validation checks.
@@ -294,6 +297,12 @@ class ValidationManager:
         
         return self._prepare_validation_report()
     
+    async def async_read_json_file(self, file_path: Path) -> Tuple[bool, Dict, str]:
+        """Read JSON from file asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self._blocking_read_json_file, file_path)
+        return self._blocking_read_json_file(file_path)
+    
     def _blocking_read_json_file(self, file_path: Path) -> Tuple[bool, Dict, str]:
         """Read JSON from file - blocking version.
         
@@ -316,6 +325,12 @@ class ValidationManager:
             return False, {}, f"IO error: {e}"
         except Exception as e:
             return False, {}, f"Unexpected error: {e}"
+    
+    async def async_validate_file_structure(self) -> ValidationResult:
+        """Validate file structure asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_file_structure)
+        return self.validate_file_structure()
     
     def validate_file_structure(self) -> ValidationResult:
         """Validate file structure.
@@ -813,18 +828,19 @@ class ValidationManager:
             }
         }
     
-    async def async_fix_issues(self, hass, issues_to_fix: List[str] = None) -> Dict[str, Any]:
+    async def async_fix_issues(self, issues_to_fix: List[str] = None) -> Dict[str, Any]:
         """Fix validation issues automatically asynchronously.
         
         Args:
-            hass: Home Assistant instance
             issues_to_fix: List of issue types to fix, or None for all fixable issues
             
         Returns:
             Dictionary with fix results
         """
-        self.set_hass(hass)
-        return await hass.async_add_executor_job(self.fix_issues, issues_to_fix)
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.fix_issues, issues_to_fix)
+        # Fallback to synchronous if no hass available
+        return self.fix_issues(issues_to_fix)
     
     def fix_issues(self, issues_to_fix: List[str] = None) -> Dict[str, Any]:
         """Fix validation issues automatically.
@@ -980,17 +996,11 @@ class ValidationManager:
         
         return results
     
-    async def async_create_missing_files(self, hass) -> Dict[str, Any]:
-        """Create missing required files with empty structures asynchronously.
-        
-        Args:
-            hass: Home Assistant instance
-            
-        Returns:
-            Dictionary with creation results
-        """
-        self.set_hass(hass)
-        return await hass.async_add_executor_job(self.create_missing_files)
+    async def async_create_missing_files(self) -> Dict[str, Any]:
+        """Create missing required files asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.create_missing_files)
+        return self.create_missing_files()
     
     def create_missing_files(self) -> Dict[str, Any]:
         """Create missing required files with empty structures.
@@ -1120,3 +1130,6 @@ class ValidationManager:
                 })
         
         return results
+
+# Create singleton instance
+VALIDATION_MANAGER = ValidationManager.get_instance()

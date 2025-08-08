@@ -76,6 +76,8 @@ class HealthCheckManager:
             hass: Home Assistant instance
         """
         self.hass = hass
+        if self.validation_manager:
+            self.validation_manager.set_hass(hass)
     
     def check_health(self, current_entity_ids: List[str] = None) -> HealthCheckResult:
         """Run a comprehensive health check. WARNING: Contains blocking calls!
@@ -120,22 +122,21 @@ class HealthCheckManager:
         """
         if not self.hass:
             raise RuntimeError("Home Assistant instance not set. Call set_hass() first.")
-            
-        self.last_check_time = time.time()
         
-        # Create result object
+        # Create result object - do this in the event loop
         result = HealthCheckResult()
+        self.last_check_time = time.time()
+            
+        # Run validation in executor
+        validation_report = await self.validation_manager.async_validate_all(current_entity_ids)
         
-        # Run validation (assuming it's not blocking; if it is, should be moved to executor)
-        validation_report = self.validation_manager.validate_all(current_entity_ids)
-        
-        # Calculate health score based on validation results
+        # Calculate health score - do this in the event loop
         self._calculate_health_score(result, validation_report)
         
-        # Generate recommendations
+        # Generate recommendations - do this in the event loop
         self._generate_recommendations(result, validation_report)
         
-        # Add system metrics (non-blocking)
+        # Add system metrics asynchronously
         await self._async_add_system_metrics(result)
         
         self.last_result = result
@@ -387,7 +388,7 @@ class HealthCheckManager:
                 next_tasks.sort(key=lambda x: x["next_run_in_seconds"])
                 result.metrics["next_tasks"] = next_tasks[:3]  # Show next 3 tasks
         
-        # Add runtime metrics
+        # Add runtime metrics - AVOIDING THE BLOCKING CPU PERCENT CALL
         import os
         import sys
         
@@ -395,11 +396,10 @@ class HealthCheckManager:
             import psutil
             process = psutil.Process(os.getpid())
             
-            # THIS IS THE BLOCKING CALL THAT CAUSES THE WARNING:
-            # We keep it here in the blocking version, but create a non-blocking alternative
+            # Use non-blocking version of CPU percent (0 interval)
             result.metrics["runtime"] = {
                 "memory_mb": round(process.memory_info().rss / (1024 * 1024), 1),
-                "cpu_percent": process.cpu_percent(interval=0.1),  # This blocks for 0.1 seconds
+                "cpu_percent": process.cpu_percent(interval=None),  # Non-blocking
                 "uptime_seconds": int(time.time() - process.create_time())
             }
         except ImportError:
@@ -412,18 +412,6 @@ class HealthCheckManager:
         # Add timestamp
         result.metrics["current_time"] = datetime.utcnow().isoformat()
     
-    def _add_system_metrics(self, result: HealthCheckResult) -> None:
-        """Add system metrics to health check result.
-        
-        Warning: Contains blocking calls, use async_add_system_metrics when in event loop.
-        
-        Args:
-            result: HealthCheckResult to update
-        """
-        # This just calls the blocking implementation
-        # WARNING: This is a blocking call
-        self._blocking_add_system_metrics(result)
-    
     async def _async_add_system_metrics(self, result: HealthCheckResult) -> None:
         """Add system metrics to health check result asynchronously.
         
@@ -433,7 +421,7 @@ class HealthCheckManager:
         if not self.hass:
             raise RuntimeError("Home Assistant instance not set. Call set_hass() first.")
         
-        # Run the blocking operation in the executor
+        # Run the blocking operation in the executor to avoid blocking the event loop
         def _get_metrics():
             # Create a dummy result to collect metrics
             dummy_result = HealthCheckResult()

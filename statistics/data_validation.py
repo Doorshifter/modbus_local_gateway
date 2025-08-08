@@ -28,6 +28,7 @@ class StorageValidator:
         """
         self.base_path = base_path
         self.meta_path = base_path / "meta.json"
+        self.hass = None
         
         # Schema definitions
         self.schemas = {
@@ -65,6 +66,10 @@ class StorageValidator:
                 "field_types": {}  # Dynamic content
             }
         }
+    
+    def set_hass(self, hass):
+        """Set Home Assistant instance for async operations."""
+        self.hass = hass
     
     def validate_file(self, file_type: str, data: Dict[str, Any]) -> Tuple[bool, List[str]]:
         """Validate a data structure against its schema.
@@ -111,6 +116,12 @@ class StorageValidator:
         
         return len(errors) == 0, errors
     
+    async def async_validate_meta(self) -> Tuple[bool, List[str]]:
+        """Validate meta file asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_meta)
+        return self.validate_meta()
+    
     def validate_meta(self) -> Tuple[bool, List[str]]:
         """Validate the meta file."""
         errors = []
@@ -143,6 +154,12 @@ class StorageValidator:
         except Exception as e:
             errors.append(f"Error validating meta file: {str(e)}")
             return False, errors
+    
+    async def async_validate_all_files(self) -> Dict[str, Any]:
+        """Validate all storage files asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_all_files)
+        return self.validate_all_files()
     
     def validate_all_files(self) -> Dict[str, Any]:
         """Validate all storage files.
@@ -217,6 +234,13 @@ class StorageValidator:
             results["overall_valid"] = False
         
         return results
+    
+    async def async_validate_entity_references(self, current_entity_ids: List[str]) -> Tuple[bool, Dict[str, Any]]:
+        """Validate entity references asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(
+                self.validate_entity_references, current_entity_ids)
+        return self.validate_entity_references(current_entity_ids)
     
     def validate_entity_references(self, current_entity_ids: List[str]) -> Tuple[bool, Dict[str, Any]]:
         """Validate entity references in stored data.
@@ -300,6 +324,13 @@ class StorageValidator:
         )
         
         return not critical_issues, issues
+    
+    async def async_fix_orphaned_entities(self, current_entity_ids: List[str]) -> Dict[str, Any]:
+        """Fix orphaned entities asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(
+                self.fix_orphaned_entities, current_entity_ids)
+        return self.fix_orphaned_entities(current_entity_ids)
     
     def fix_orphaned_entities(self, current_entity_ids: List[str]) -> Dict[str, Any]:
         """Remove orphaned entities from storage.

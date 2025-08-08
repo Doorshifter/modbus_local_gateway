@@ -116,6 +116,12 @@ class ResourceAdapter:
         """Get system information for diagnostics."""
         return self._system_capabilities
     
+    # Added method to match what's expected in __init__.py
+    def get_capabilities(self) -> Dict[str, Any]:
+        """Get the measured system capabilities."""
+        # This is just an alias for get_system_info
+        return self.get_system_info()
+    
     def analyze_performance_trend(self, recent_performances: list) -> Dict[str, Any]:
         """Analyze recent performance measurements and adjust recommendations."""
         if not recent_performances or len(recent_performances) < 5:
