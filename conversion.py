@@ -212,6 +212,14 @@ class Conversion:
         self, desc: ModbusEntityDescription, response
     ) -> str | float | int | bool | None:
         """Entry point for conversion from response (registers or bits or sliced registers)"""
+        try:
+            result = self._convert_from_register_response(desc, response)
+            _LOGGER.debug("Conversion for key '%s': raw=%s → result=%s", 
+                        desc.key, response, result)
+            return result
+        except Exception as e:
+            _LOGGER.error("Conversion error for key '%s': %s", desc.key, e)
+            return None
         # Accept both a ModbusPDU and a sequence of ints (e.g. from slicing)
         from collections.abc import Sequence as abcSequence
 

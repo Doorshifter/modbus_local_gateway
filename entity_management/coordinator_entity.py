@@ -163,6 +163,9 @@ class ModbusCoordinatorEntity(CoordinatorEntity):
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         try:
+            # Call the abstract method to update the entity's state from the coordinator
+            self._update_from_coordinator()
+            
             # Get current value using entity-specific method
             current_value = self._get_current_value()
             old_value = self._last_native_value

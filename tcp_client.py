@@ -104,10 +104,16 @@ class AsyncModbusTcpClientGateway(AsyncModbusTcpClient):
         if hasattr(self, 'context') and hasattr(self.context, 'reset'):
             try:
                 self.context.reset()
+                _LOGGER.debug("Transaction manager reset to clear pending transactions.")
             except Exception as e:
                 _LOGGER.debug("Failed to reset transaction manager: %s", e)
         
-        await asyncio.sleep(0.1)
+
+        # Introduce a small delay to allow any late, in-flight packets to be
+        # discarded by the OS while the socket is closed. This makes the
+        # subsequent reconnect cleaner and less prone to transaction ID mismatches.
+        await asyncio.sleep(0.25)
+        
         await self.connect()
 
     def _update_timeout(self, rtt_sample: float) -> None:

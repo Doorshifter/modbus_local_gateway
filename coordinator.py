@@ -863,7 +863,10 @@ class ModbusCoordinator(DataUpdateCoordinator):
                 # Coordinator ready check
                 if not self._ready_event_fired and successful_reads > 0:
                     self._signal_coordinator_ready()
-    
+
+                _LOGGER.debug("Final data to be set: %s", 
+                         {k: "value_present" if v is not None else "None" 
+                          for k, v in data.items()})
                 return data
     
             except Exception as exc:

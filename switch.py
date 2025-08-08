@@ -2,22 +2,29 @@
 
 import logging
 
-# Minimal top-level imports
+from homeassistant.components.switch import SwitchEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from .context import ModbusContext
+from .coordinator import ModbusCoordinator
+from .entity_management.base import ModbusSwitchEntityDescription
+from .entity_management.const import ControlType, ModbusDataType
+from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+from .helpers import async_setup_entities
+
 _LOGGER = logging.getLogger(__name__)
 DOMAIN = "modbus_local_gateway"
-
-# Constants
 INVALID_DATA_TYPE = "Invalid data_type for switch"
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+):
     """Set up the switch platform."""
-    # Import modules only when needed
-    from homeassistant.config_entries import ConfigEntry
-    from homeassistant.helpers.entity_platform import AddEntitiesCallback
-    
-    from .entity_management.const import ControlType
-    from .helpers import async_setup_entities
-    
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -26,112 +33,44 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         entity_class=ModbusSwitchEntity,
     )
 
-class ModbusSwitchEntity:
+
+class ModbusSwitchEntity(ModbusCoordinatorEntity, SwitchEntity):
     """Switch entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator,
-        modbus_context,
-        device,
+        coordinator: ModbusCoordinator,
+        modbus_context: ModbusContext,
+        device: dict,
     ):
         """Initialize the Modbus switch."""
-        # Import needed modules inside the method
-        import asyncio
-        from homeassistant.components.switch import SwitchEntity
-        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-        from .entity_management.base import ModbusSwitchEntityDescription
-        
-        # Multiple inheritance using class objects dynamically loaded
-        self.__class__ = type(
-            self.__class__.__name__,
-            (ModbusCoordinatorEntity, SwitchEntity),
-            {}
-        )
-        
-        # Initialize parent classes using super()
-        ModbusCoordinatorEntity.__init__(
-            self,
+        super().__init__(
             coordinator=coordinator,
             modbus_context=modbus_context,
-            device_info=device
+            device_info=device,
         )
-        
+
         if not isinstance(modbus_context.desc, ModbusSwitchEntityDescription):
-            raise TypeError("Invalid description type")
-            
-        # Set both properties for consistency
-        self._attr_entity_description = modbus_context.desc
+            raise TypeError("Invalid description type for ModbusSwitchEntity")
+
         self.entity_description = modbus_context.desc
+        self._attr_is_on = None  # Initialize state
 
-    def _get_current_value(self):
-        """Get current switch state."""
-        return self.is_on
+    def _update_from_coordinator(self):
+        """Update the entity's state from the coordinator's data."""
+        key = self.entity_description.key
+        value = self.coordinator.data.get(key)
 
-    @property
-    def native_value(self):
-        """Return the native value from coordinator data."""
-        # Safe access to entity key
-        key = getattr(self.entity_description, "key", None) if hasattr(self, "entity_description") else None
-        if key is None and hasattr(self, "_attr_entity_description"):
-            key = getattr(self._attr_entity_description, "key", None)
-        return self.coordinator.data.get(key) if key else None
-
-    @property
-    def is_on(self):
-        """Return true if the switch is on."""
-        value = self.native_value
         if value is None:
-            return None
-            
-        # Safe access to entity description
-        on_value = None
-        if hasattr(self, "entity_description"):
-            on_value = getattr(self.entity_description, "on", True)
-        elif hasattr(self, "_attr_entity_description"):
-            on_value = getattr(self._attr_entity_description, "on", True)
-        return value == on_value
-
-    def _generate_extra_attributes(self):
-        """Add switch-specific attributes."""
-        attrs = super()._generate_extra_attributes()
-        
-        # Add switch-specific attributes
-        desc = getattr(self._modbus_context, "desc", None)
-        if desc:
-            attrs.update({
-                "on_value": getattr(desc, "on", True),
-                "off_value": getattr(desc, "off", False),
-            })
-        
-        return attrs
-
-    def turn_on(self, **kwargs):
-        """Synchronously turn the entity on (calls async)."""
-        import asyncio
-        future = asyncio.run_coroutine_threadsafe(self.async_turn_on(**kwargs), self.hass.loop)
-        future.result()
-
-    def turn_off(self, **kwargs):
-        """Synchronously turn the entity off (calls async)."""
-        import asyncio
-        future = asyncio.run_coroutine_threadsafe(self.async_turn_off(**kwargs), self.hass.loop)
-        future.result()
-
-    async def async_turn_on(self, **kwargs):
-        """Asynchronously turn the entity on."""
-        # Import needed modules inside the method
-        from .entity_management.const import ModbusDataType
-        
-        # Safe access to entity description
-        if hasattr(self, "entity_description"):
-            desc = self.entity_description
-        elif hasattr(self, "_attr_entity_description"):
-            desc = self._attr_entity_description
-        else:
-            _LOGGER.error("Missing entity description for %s", self.name)
+            self._attr_is_on = None
             return
-            
+
+        on_value = getattr(self.entity_description, "on", True)
+        self._attr_is_on = value == on_value
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Asynchronously turn the entity on."""
+        desc = self.entity_description
         if desc.data_type == ModbusDataType.COIL:
             value_to_write = bool(desc.on)
             await self.coordinator.async_write_coil(
@@ -149,20 +88,9 @@ class ModbusSwitchEntity:
         else:
             raise ValueError(INVALID_DATA_TYPE)
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Asynchronously turn the entity off."""
-        # Import needed modules inside the method
-        from .entity_management.const import ModbusDataType
-        
-        # Safe access to entity description
-        if hasattr(self, "entity_description"):
-            desc = self.entity_description
-        elif hasattr(self, "_attr_entity_description"):
-            desc = self._attr_entity_description
-        else:
-            _LOGGER.error("Missing entity description for %s", self.name)
-            return
-            
+        desc = self.entity_description
         if desc.data_type == ModbusDataType.COIL:
             value_to_write = bool(desc.off)
             await self.coordinator.async_write_coil(
@@ -179,3 +107,15 @@ class ModbusSwitchEntity:
             )
         else:
             raise ValueError(INVALID_DATA_TYPE)
+            
+    def _generate_extra_attributes(self):
+        """Add switch-specific attributes."""
+        attrs = super()._generate_extra_attributes()
+        desc = getattr(self._modbus_context, "desc", None)
+        if desc:
+            attrs.update({
+                "on_value": getattr(desc, "on", True),
+                "off_value": getattr(desc, "off", False),
+            })
+        
+        return attrs

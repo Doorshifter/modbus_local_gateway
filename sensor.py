@@ -3,23 +3,28 @@
 import logging
 import asyncio
 
-# Minimal top-level imports
+# Import required Home Assistant components and base classes
+from homeassistant.components.sensor import SensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+# Import from custom component
+from .entity_management.const import ControlType
+from .helpers import async_setup_entities, get_gateway_key
+from .entity_management.coordinator_entity import ModbusCoordinatorEntity
+from .entity_management.base import ModbusSensorEntityDescription
+from .context import ModbusContext
+from .coordinator import ModbusCoordinator
+
 _LOGGER = logging.getLogger(__name__)
 DOMAIN = "modbus_local_gateway"
 
 # Dictionary to track setup status for each gateway key
 _DIAGNOSTIC_SETUP_STATUS = {}
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry, async_add_entities: AddEntitiesCallback):
     """Set up the sensor platform."""
-    # Import modules only when needed
-    from homeassistant.config_entries import ConfigEntry
-    from homeassistant.core import HomeAssistant, callback
-    from homeassistant.helpers.entity_platform import AddEntitiesCallback
-    
-    from .entity_management.const import ControlType
-    from .helpers import async_setup_entities, get_gateway_key
-    
     await async_setup_entities(
         hass=hass,
         config_entry=config_entry,
@@ -184,31 +189,17 @@ async def _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gate
             _LOGGER.exception("Failed to set up diagnostic sensors: %s", exc)
             hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "failed"
 
-class ModbusSensorEntity:
+class ModbusSensorEntity(ModbusCoordinatorEntity, SensorEntity):
     """Sensor entity for Modbus gateway."""
 
     def __init__(
         self,
-        coordinator,
-        modbus_context,
-        device,
+        coordinator: ModbusCoordinator,
+        modbus_context: ModbusContext,
+        device: dict,
     ):
         """Initialize the Modbus sensor."""
-        # Import needed modules inside the method
-        from homeassistant.components.sensor import SensorEntity
-        from .entity_management.coordinator_entity import ModbusCoordinatorEntity
-        from .entity_management.base import ModbusSensorEntityDescription
-        
-        # Multiple inheritance using class objects dynamically loaded
-        self.__class__ = type(
-            self.__class__.__name__,
-            (ModbusCoordinatorEntity, SensorEntity),
-            {}
-        )
-        
-        # Initialize parent classes using super()
-        ModbusCoordinatorEntity.__init__(
-            self,
+        super().__init__(
             coordinator=coordinator,
             modbus_context=modbus_context,
             device_info=device
@@ -217,24 +208,17 @@ class ModbusSensorEntity:
         if not isinstance(modbus_context.desc, ModbusSensorEntityDescription):
             raise TypeError(f"Invalid description type: {type(modbus_context.desc)}")
         
-        # Store the entity description as both properties
-        self._attr_entity_description = modbus_context.desc
+        # Store the entity description and initialize the native value
         self.entity_description = modbus_context.desc
+        self._attr_native_value = None
 
-    def _get_current_value(self):
-        """Get current sensor value."""
-        return self.native_value
-
-    @property
-    def native_value(self):
-        """Return the native value from coordinator data."""
-        # Access entity key safely
-        key = getattr(self.entity_description, "key", None) if hasattr(self, "entity_description") else None
-        if key is None and hasattr(self, "_attr_entity_description"):
-            key = getattr(self._attr_entity_description, "key", None)
+    def _update_from_coordinator(self):
+        """Update the entity's state from the coordinator's data."""
+        # This method is called by the base class when new data is available.
+        key = self.entity_description.key
         
-        # Fallback to other identifiers if needed
-        if key is None:
-            key = getattr(self, "unique_id", None)
-            
-        return self.coordinator.data.get(key) if key else None
+        if self.coordinator.data and key in self.coordinator.data:
+            self._attr_native_value = self.coordinator.data[key]
+        else:
+            # Set to None if the key is not in the data, which results in an "unknown" state
+            self._attr_native_value = None
