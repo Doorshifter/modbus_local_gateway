@@ -61,6 +61,11 @@ class StorageValidator:
                 "required_fields": [],  # Dynamic content
                 "field_types": {}  # Dynamic content
             },
+            # Add a schema for "correlation" to fix the validation error
+            "correlation": {
+                "required_fields": [],  # Dynamic content
+                "field_types": {}  # Dynamic content
+            },
             "interval_history": {
                 "required_fields": [],  # Dynamic content
                 "field_types": {}  # Dynamic content

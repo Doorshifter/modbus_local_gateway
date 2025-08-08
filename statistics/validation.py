@@ -9,14 +9,27 @@ import json
 import logging
 import os
 import time
+import asyncio
 from datetime import datetime, timedelta
+from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Any, Set, Optional, Tuple, Union
+from typing import Dict, List, Any, Set, Optional, Tuple, Union, Callable
+
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.event import async_call_later
 
 from .storage import StatisticsStorageManager
 from .data_validation import StorageValidator
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class ValidationStage(Enum):
+    """Validation system stage enum to track lifecycle."""
+    INITIALIZING = "initializing"  # During HA startup
+    READY = "ready"                # After HA fully started
+    SHUTDOWN = "shutdown"          # During shutdown
+
 
 class ValidationResult:
     """Represents the result of a validation check."""
@@ -67,7 +80,7 @@ class ValidationResult:
 
 
 class ValidationManager:
-    """Manages system validation and health checks."""
+    """Manages system validation and health checks with lifecycle awareness."""
     
     _instance = None
     
@@ -86,6 +99,12 @@ class ValidationManager:
         self.validation_results: Dict[str, ValidationResult] = {}
         self.overall_status = "unknown"
         self.hass = None
+        self.current_stage = ValidationStage.INITIALIZING
+        
+        # Scheduled tasks and callbacks
+        self._scheduled_validations = {}
+        self._deferred_validations = []
+        self._startup_validation_scheduled = False
         
         # Define required files
         self.required_files = [
@@ -102,11 +121,8 @@ class ValidationManager:
         for component in ["file_structure", "entity_consistency", "clusters", 
                           "scan_intervals", "data_quality", "overall"]:
             self.validation_results[component] = ValidationResult(component)
-        
-        # Check if required files exist, create them if missing
-        self._initialize_storage_if_needed()
     
-    def set_hass(self, hass):
+    def set_hass(self, hass: HomeAssistant) -> None:
         """Set Home Assistant instance for async operations.
         
         Args:
@@ -115,9 +131,95 @@ class ValidationManager:
         self.hass = hass
         if self.storage_validator:
             self.storage_validator.set_hass(hass)
+            
+        # Register with HA lifecycle events
+        if hasattr(hass, 'bus'):
+            # Listen for the start event to know when HA is fully started
+            hass.bus.async_listen_once(
+                'homeassistant_started', 
+                self._async_handle_ha_started
+            )
+            
+            # Register for stop event to cleanup
+            hass.bus.async_listen_once(
+                'homeassistant_stop',
+                self._async_handle_ha_stop
+            )
+        
+        # Check if required files exist, create them if missing
+        # Use the async method to avoid blocking
+        hass.async_create_task(self.async_initialize_storage_if_needed())
+    
+    async def _async_handle_ha_started(self, _):
+        """Handle Home Assistant fully started event."""
+        _LOGGER.info("Home Assistant started - switching to READY validation stage")
+        self.current_stage = ValidationStage.READY
+        
+        # Process any deferred validations
+        if self._deferred_validations:
+            _LOGGER.info("Processing %d deferred validation tasks", len(self._deferred_validations))
+            
+            # Schedule the first full validation after 10 seconds
+            if not self._startup_validation_scheduled:
+                self._startup_validation_scheduled = True
+                async_call_later(self.hass, 10, self._run_startup_validation)
+    
+    async def _run_startup_validation(self, _=None):
+        """Run startup validation after HA is fully started."""
+        _LOGGER.info("Running startup validation")
+        
+        # Get current entity IDs - fetch all entity IDs from Home Assistant
+        current_entity_ids = []
+        if self.hass and hasattr(self.hass, 'states'):
+            current_entity_ids = list(self.hass.states.async_entity_ids())
+            
+        # Run validation in executor
+        await self.async_validate_all(current_entity_ids)
+        
+        _LOGGER.info("Startup validation completed with status: %s", self.overall_status)
+    
+    async def _async_handle_ha_stop(self, _):
+        """Handle Home Assistant stopping."""
+        _LOGGER.info("Home Assistant stopping - cleaning up validation tasks")
+        self.current_stage = ValidationStage.SHUTDOWN
+        
+        # Cancel any pending validations
+        for validation_name, cancellable in self._scheduled_validations.items():
+            if isinstance(cancellable, asyncio.Task) and not cancellable.done():
+                _LOGGER.debug("Cancelling pending validation: %s", validation_name)
+                cancellable.cancel()
+    
+    async def async_initialize_storage_if_needed(self):
+        """Initialize storage files asynchronously if they don't exist."""
+        # Check if base directory exists and required files are present
+        missing_files = []
+        
+        # Run the check in executor
+        def _check_files():
+            nonlocal missing_files
+            for filename in self.required_files:
+                file_path = self.storage.base_path / filename
+                if not os.path.exists(file_path):
+                    missing_files.append(filename)
+            return missing_files
+            
+        missing_files = await self.hass.async_add_executor_job(_check_files)
+        
+        if missing_files:
+            _LOGGER.info("First-time setup: Creating required storage files")
+            try:
+                result = await self.async_create_missing_files()
+                _LOGGER.info("Created files: %s", result["created_files"])
+                if result["failed_creations"]:
+                    _LOGGER.error("Failed to create some files: %s", result["failed_creations"])
+            except Exception as e:
+                _LOGGER.error("Failed to initialize storage files: %s", e)
     
     def _initialize_storage_if_needed(self):
-        """Initialize storage files if they don't exist."""
+        """Initialize storage files if they don't exist (synchronous version).
+        
+        This is the blocking version - avoid calling from the event loop.
+        """
         # Check if base directory exists and required files are present
         missing_files = []
         for filename in self.required_files:
@@ -144,13 +246,26 @@ class ValidationManager:
         Returns:
             Dictionary with validation results
         """
+        if self.current_stage == ValidationStage.INITIALIZING:
+            _LOGGER.info("Deferring validation until Home Assistant is fully started")
+            result = {
+                "overall_status": "deferred",
+                "timestamp": datetime.utcnow().isoformat(),
+                "message": "Validation deferred until Home Assistant startup is complete"
+            }
+            # Add to deferred validations list
+            self._deferred_validations.append(("validate_all", current_entity_ids))
+            return result
+            
+        # Run in executor to avoid blocking the event loop
         if self.hass:
             return await self.hass.async_add_executor_job(self.validate_all, current_entity_ids)
+        
         # Fallback to synchronous if no hass available
         return self.validate_all(current_entity_ids)
     
     def validate_all(self, current_entity_ids: List[str] = None) -> Dict[str, Any]:
-        """Run all validation checks.
+        """Run all validation checks (synchronous version).
         
         Args:
             current_entity_ids: List of currently active entity IDs
@@ -158,6 +273,7 @@ class ValidationManager:
         Returns:
             Dictionary with validation results
         """
+        # This method contains blocking I/O - should be run in an executor
         start_time = time.time()
         self.last_validation_time = start_time
         
@@ -328,6 +444,13 @@ class ValidationManager:
     
     async def async_validate_file_structure(self) -> ValidationResult:
         """Validate file structure asynchronously."""
+        # Skip during initialization to avoid blocking the event loop
+        if self.current_stage == ValidationStage.INITIALIZING:
+            result = ValidationResult("file_structure")
+            result.status = "deferred"
+            result.add_info("File structure validation deferred until startup is complete")
+            return result
+            
         if self.hass:
             return await self.hass.async_add_executor_job(self.validate_file_structure)
         return self.validate_file_structure()
@@ -338,6 +461,7 @@ class ValidationManager:
         Returns:
             ValidationResult object
         """
+        # This method contains blocking I/O and should be run in an executor
         result = ValidationResult("file_structure")
         
         # Check if base directory exists
@@ -371,14 +495,36 @@ class ValidationManager:
         
         # Validate all files
         validation_results = self.storage_validator.validate_all_files()
+        
+        # Check if the overall validation failed
         if not validation_results["overall_valid"]:
-            # Add file-specific errors
+            # Add file-specific errors or warnings
+            critical_errors = False
+            
             for file_type, file_result in validation_results["files"].items():
                 if not file_result["valid"]:
-                    for error in file_result["errors"]:
-                        result.add_error(f"{file_type} error: {error}")
+                    # Check if this is a required file or not
+                    file_path = f"{file_type}.json"
+                    if file_path in self.required_files:
+                        # Required file has errors - add as error
+                        for error in file_result["errors"]:
+                            result.add_error(f"{file_type} error: {error}")
+                        critical_errors = True
+                    elif "No schema defined" in str(file_result["errors"]):
+                        # Non-required file with no schema - add as warning
+                        for error in file_result["errors"]:
+                            result.add_warning(f"{file_type} warning: {error}")
+                    else:
+                        # Other errors in non-required file - add as warning
+                        for error in file_result["errors"]:
+                            result.add_warning(f"{file_type} warning: {error}")
             
             result.details["validation_results"] = validation_results
+            
+            # If there are critical errors in required files, return early
+            if critical_errors and result.errors:
+                self.validation_results["file_structure"] = result
+                return result
         else:
             result.add_info("All files passed schema validation")
         
@@ -430,6 +576,14 @@ class ValidationManager:
         self.validation_results["file_structure"] = result
         return result
     
+    async def async_validate_entity_consistency(self, current_entity_ids: List[str]) -> ValidationResult:
+        """Validate entity consistency asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(
+                self.validate_entity_consistency, current_entity_ids
+            )
+        return self.validate_entity_consistency(current_entity_ids)
+    
     def validate_entity_consistency(self, current_entity_ids: List[str]) -> ValidationResult:
         """Validate entity consistency between storage and HA.
         
@@ -439,6 +593,7 @@ class ValidationManager:
         Returns:
             ValidationResult object
         """
+        # This method contains blocking I/O and should be run in an executor
         result = ValidationResult("entity_consistency")
         
         # Get stored entity IDs
@@ -533,12 +688,19 @@ class ValidationManager:
         self.validation_results["entity_consistency"] = result
         return result
     
+    async def async_validate_clusters(self) -> ValidationResult:
+        """Validate cluster assignments asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_clusters)
+        return self.validate_clusters()
+    
     def validate_clusters(self) -> ValidationResult:
         """Validate cluster assignments.
         
         Returns:
             ValidationResult object
         """
+        # This method contains blocking I/O and should be run in an executor
         result = ValidationResult("clusters")
         
         # Get clusters
@@ -626,12 +788,19 @@ class ValidationManager:
         self.validation_results["clusters"] = result
         return result
     
+    async def async_validate_scan_intervals(self) -> ValidationResult:
+        """Validate scan interval assignments asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_scan_intervals)
+        return self.validate_scan_intervals()
+    
     def validate_scan_intervals(self) -> ValidationResult:
         """Validate scan interval assignments.
         
         Returns:
             ValidationResult object
         """
+        # This method contains blocking I/O and should be run in an executor
         result = ValidationResult("scan_intervals")
         
         # Get entity stats
@@ -733,12 +902,19 @@ class ValidationManager:
         self.validation_results["scan_intervals"] = result
         return result
     
+    async def async_validate_data_quality(self) -> ValidationResult:
+        """Validate data quality asynchronously."""
+        if self.hass:
+            return await self.hass.async_add_executor_job(self.validate_data_quality)
+        return self.validate_data_quality()
+    
     def validate_data_quality(self) -> ValidationResult:
         """Validate data quality for analysis.
         
         Returns:
             ValidationResult object
         """
+        # This method contains blocking I/O and should be run in an executor
         result = ValidationResult("data_quality")
         
         # Get entity stats
@@ -822,6 +998,7 @@ class ValidationManager:
         return {
             "overall_status": self.overall_status,
             "timestamp": datetime.utcnow().isoformat(),
+            "validation_stage": self.current_stage.value,
             "results": {
                 component: result.as_dict()
                 for component, result in self.validation_results.items()
@@ -837,6 +1014,13 @@ class ValidationManager:
         Returns:
             Dictionary with fix results
         """
+        # Skip during initialization
+        if self.current_stage == ValidationStage.INITIALIZING:
+            return {
+                "status": "deferred",
+                "message": "Issue fixes deferred until Home Assistant startup is complete"
+            }
+            
         if self.hass:
             return await self.hass.async_add_executor_job(self.fix_issues, issues_to_fix)
         # Fallback to synchronous if no hass available

@@ -59,17 +59,16 @@ async def async_setup_entry(hass, entry):
         from .statistics.persistent_statistics import PERSISTENT_STATISTICS_MANAGER
         
         config_dir = hass.config.path()
-        storage_path = Path(config_dir) / "modbus_statistics"
+        storage_path = Path(config_dir) / "modbus_state"
         
-        # Initialize persistent statistics first
+        # Initialize storage in executor to avoid blocking
         await hass.async_add_executor_job(PERSISTENT_STATISTICS_MANAGER.initialize, storage_path)
-        _LOGGER.info(f"Persistent statistics initialized with storage path: {storage_path}")
+        _LOGGER.info(f"Initialized statistics storage at {storage_path}")
         
-        # Now that storage is initialized, we can initialize other components
+        # Initialize other statistics components
         from .statistics.validation import ValidationManager
         validation_manager = ValidationManager.get_instance()
         validation_manager.set_hass(hass)
-        await hass.async_add_executor_job(validation_manager._initialize_storage_if_needed)
         
         # Initialize parameter manager
         from .statistics.adaptive_parameters import PARAMETER_MANAGER
@@ -79,9 +78,9 @@ async def async_setup_entry(hass, entry):
         from .statistics.self_healing import SELF_HEALING_SYSTEM
         await hass.async_add_executor_job(SELF_HEALING_SYSTEM.initialize, storage_path)
         
-        # Now initialize the statistics manager
+        # Initialize statistics manager
         from .statistics.manager import STATISTICS_MANAGER
-        STATISTICS_MANAGER.hass = hass  # Ensure hass is set
+        STATISTICS_MANAGER.hass = hass
         await hass.async_add_executor_job(STATISTICS_MANAGER.ensure_initialized)
         
     except Exception as e:
@@ -198,6 +197,7 @@ async def async_setup_entry(hass, entry):
     try:
         from .statistics import STATISTICS_MANAGER
         
+        # Use async_add_executor_job to prevent blocking
         await hass.async_add_executor_job(
             STATISTICS_MANAGER.register_coordinator, 
             gateway_key, 

@@ -1,10 +1,14 @@
 """Sensor platform for Modbus Local Gateway."""
 
 import logging
+import asyncio
 
 # Minimal top-level imports
 _LOGGER = logging.getLogger(__name__)
 DOMAIN = "modbus_local_gateway"
+
+# Dictionary to track setup status for each gateway key
+_DIAGNOSTIC_SETUP_STATUS = {}
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up the sensor platform."""
@@ -26,121 +30,159 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     gateway_key = get_gateway_key(config_entry, with_slave=True)
 
+    # Initialize the setup status dictionary if it doesn't exist
+    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_STATUS"):
+        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"] = {}
+
+    # We'll use a lock to prevent concurrent setup attempts
+    setup_lock = asyncio.Lock()
+
     @callback
     def coordinator_ready_callback(event):
         """Handle coordinator ready event."""
         _LOGGER.debug("Coordinator ready event fired for gateway_key=%s event.data=%s", gateway_key, event.data)
         if event.data.get("gateway_key") == gateway_key:
-            # Create a set here to track setup status
-            if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
-                hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
-                
-            if gateway_key in hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"]:
-                _LOGGER.debug("Diagnostics already set up for gateway_key=%s, skipping.", gateway_key)
+            # Check if setup is already complete or in progress
+            setup_status = hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"].get(gateway_key)
+            if setup_status == "complete" or setup_status == "in_progress":
+                _LOGGER.debug("Diagnostics already %s for gateway_key=%s, skipping.", 
+                             setup_status, gateway_key)
                 return
                 
+            # Mark as in progress and start setup
+            hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "in_progress"
             hass.async_create_task(
-                _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key)
+                _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key, setup_lock)
             )
 
     hass.bus.async_listen(f"{DOMAIN}_coordinator_ready", coordinator_ready_callback)
 
-    # Create a set here to track setup status
-    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
-        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
-        
-    if gateway_key not in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
-        import asyncio
+    # Initialize delayed setup only if not already set up or in progress
+    setup_status = hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_STATUS", {}).get(gateway_key)
+    if setup_status != "complete" and setup_status != "in_progress":
         hass.async_create_task(
-            _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key)
+            _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key, setup_lock)
         )
 
-async def _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key):
+async def _delayed_diagnostic_setup_check(hass, config_entry, async_add_entities, gateway_key, setup_lock):
     """Delayed check for diagnostic sensor setup."""
-    import asyncio
-    
     _LOGGER.debug("Delayed diagnostic setup check running for gateway_key=%s", gateway_key)
     await asyncio.sleep(3)
 
-    # Create a set here to track setup status if not exists
-    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
-        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
-
-    if gateway_key in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
-        _LOGGER.debug("Diagnostics already set up in delayed check for gateway_key=%s, skipping.", gateway_key)
+    # Check if setup has already happened or is in progress
+    setup_status = hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_STATUS", {}).get(gateway_key)
+    if setup_status == "complete" or setup_status == "in_progress":
+        _LOGGER.debug("Diagnostics already %s in delayed check for gateway_key=%s, skipping.", 
+                      setup_status, gateway_key)
         return
 
     if gateway_key in hass.data.get(DOMAIN, {}):
         coordinator = hass.data[DOMAIN][gateway_key]
         initialized = getattr(coordinator, '_initialized', False)
 
-        if initialized and gateway_key not in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
-            await _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key)
-        elif not initialized:
+        if initialized:
+            # Mark as in progress before we start
+            hass.data[DOMAIN].setdefault("_DIAGNOSTIC_SETUP_STATUS", {})[gateway_key] = "in_progress"
+            await _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key, setup_lock)
+        else:
             _LOGGER.debug("Delayed check: Coordinator for %s NOT initialized", gateway_key)
     else:
         _LOGGER.debug("Delayed check: Coordinator for %s not found in hass.data[DOMAIN]", gateway_key)
 
-async def _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key):
+async def _setup_diagnostic_sensors(hass, config_entry, async_add_entities, gateway_key, setup_lock):
     """Set up diagnostic sensors."""
-    _LOGGER.debug("Setting up diagnostic sensors for gateway_key=%s", gateway_key)
-    
-    # Create a set here to track setup status if not exists
-    if not hasattr(hass.data[DOMAIN], "_DIAGNOSTIC_SETUP_COMPLETE"):
-        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"] = set()
+    # Use the lock to prevent concurrent setup for the same gateway key
+    async with setup_lock:
+        # Double-check if setup is already complete
+        setup_status = hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_STATUS", {}).get(gateway_key)
+        if setup_status == "complete":
+            _LOGGER.debug("Diagnostics already set up for gateway_key=%s, exiting.", gateway_key)
+            return
+            
+        # Mark as in progress (in case it wasn't already)
+        hass.data[DOMAIN].setdefault("_DIAGNOSTIC_SETUP_STATUS", {})[gateway_key] = "in_progress"
         
-    if gateway_key in hass.data[DOMAIN].get("_DIAGNOSTIC_SETUP_COMPLETE", set()):
-        _LOGGER.debug("Diagnostics already set up for gateway_key=%s, exiting.", gateway_key)
-        return
+        _LOGGER.debug("Setting up diagnostic sensors for gateway_key=%s", gateway_key)
 
-    try:
-        # Import diagnostic sensor module when needed, not at module load time
-        from .diagnostic_sensor import DIAGNOSTIC_SENSORS, ModbusDiagnosticSensor, build_device_info
-    except ImportError as err:
-        _LOGGER.error("Diagnostic sensor module not available: %r", err)
-        return
-
-    try:
-        if gateway_key not in hass.data.get(DOMAIN, {}):
-            _LOGGER.warning("Coordinator not found for diagnostic sensors: %s", gateway_key)
+        try:
+            # Import diagnostic sensor module when needed, not at module load time
+            from .diagnostic_sensor import DIAGNOSTIC_SENSORS, ModbusDiagnosticSensor, build_device_info
+        except ImportError as err:
+            _LOGGER.error("Diagnostic sensor module not available: %r", err)
+            # Reset status since setup failed
+            hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "failed"
             return
 
-        coordinator = hass.data[DOMAIN][gateway_key]
+        try:
+            if gateway_key not in hass.data.get(DOMAIN, {}):
+                _LOGGER.warning("Coordinator not found for diagnostic sensors: %s", gateway_key)
+                hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "failed"
+                return
 
-        if not getattr(coordinator, '_initialized', False):
-            _LOGGER.warning("Coordinator for %s is NOT initialized", gateway_key)
-            return
+            coordinator = hass.data[DOMAIN][gateway_key]
 
-        device_info = getattr(coordinator, "device_info", None)
-        if not device_info:
-            _LOGGER.warning("Device info missing for coordinator %s", gateway_key)
-            return
+            if not getattr(coordinator, '_initialized', False):
+                _LOGGER.warning("Coordinator for %s is NOT initialized", gateway_key)
+                hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "pending"
+                return
 
-        device_info_dict = build_device_info(device_info, config_entry)
-        device_info_dict["name"] = f"{device_info_dict.get('name', 'Device')} Diagnostics"
-        entities_to_add = [
-            ModbusDiagnosticSensor(
-                coordinator=coordinator,
-                description=description,
-                config_entry=config_entry,
-                device_info=device_info_dict,
-            )
-            for description in DIAGNOSTIC_SENSORS
-        ]
+            device_info = getattr(coordinator, "device_info", None)
+            if not device_info:
+                _LOGGER.warning("Device info missing for coordinator %s", gateway_key)
+                hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "failed"
+                return
 
-        _LOGGER.info(
-            "Adding %d diagnostic sensor entities for gateway %s: %s",
-            len(entities_to_add), gateway_key, [e.entity_description.key for e in entities_to_add]
-        )
-        async_add_entities(entities_to_add, True)
-        hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_COMPLETE"].add(gateway_key)
-        _LOGGER.info(
-            "Added %d diagnostic sensor entities for gateway %s",
-            len(entities_to_add), gateway_key
-        )
+            # Create device info dictionary
+            device_info_dict = build_device_info(device_info, config_entry)
+            
+            # Generate a stable unique ID hash - use a consistent property from config_entry
+            config_id = config_entry.entry_id
 
-    except Exception as exc:
-        _LOGGER.exception("Failed to set up diagnostic sensors: %s", exc)
+            # Create sensor entities with the config ID included for unique ID generation
+            entities_to_add = []
+            for description in DIAGNOSTIC_SENSORS:
+                try:
+                    entity = ModbusDiagnosticSensor(
+                        coordinator=coordinator,
+                        description=description,
+                        config_entry=config_entry,
+                        device_info=device_info,
+                    )
+                    entities_to_add.append(entity)
+                except Exception as e:
+                    _LOGGER.warning("Error creating diagnostic sensor %s: %s", description.key, e)
+
+            if entities_to_add:
+                _LOGGER.info(
+                    "Adding %d diagnostic sensor entities for gateway %s: %s",
+                    len(entities_to_add), gateway_key, [e.entity_description.key for e in entities_to_add]
+                )
+                
+                # Check for existing entity IDs to prevent duplicates
+                unique_ids = set()
+                entities_to_add_deduped = []
+                
+                for entity in entities_to_add:
+                    if entity._attr_unique_id not in unique_ids:
+                        unique_ids.add(entity._attr_unique_id)
+                        entities_to_add_deduped.append(entity)
+                    else:
+                        _LOGGER.warning(
+                            "Duplicate unique ID detected and skipped: %s", entity._attr_unique_id
+                        )
+                
+                async_add_entities(entities_to_add_deduped, True)
+                _LOGGER.info(
+                    "Added %d diagnostic sensor entities for gateway %s",
+                    len(entities_to_add_deduped), gateway_key
+                )
+            
+            # Mark setup as complete only after adding entities
+            hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "complete"
+
+        except Exception as exc:
+            _LOGGER.exception("Failed to set up diagnostic sensors: %s", exc)
+            hass.data[DOMAIN]["_DIAGNOSTIC_SETUP_STATUS"][gateway_key] = "failed"
 
 class ModbusSensorEntity:
     """Sensor entity for Modbus gateway."""
