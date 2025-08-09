@@ -1225,8 +1225,8 @@ read_write_word:
     size: 1
     control: select
     options:
-      0: "Auto"
-      1: "Manual"
+      1: "Auto"
+      0: "Manual"
       2: "Additional heat only"
     multiplier: 1
     entity_category: config
